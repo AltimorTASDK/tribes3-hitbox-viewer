@@ -1,4 +1,8 @@
-'use strict';
+import $ from 'jquery';
+import 'jcanvas';
+
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const ROTATION_SENSITIVITY = 0.3;
 
@@ -22,7 +26,6 @@ let sphereGeom = null;
 let boxGeom = null;
 
 let cameraRotation = {Pitch: 0, Yaw: 0, Roll: 0};
-let dragging = false;
 
 function hamiltonProduct(a, b)
 {
@@ -221,7 +224,6 @@ function renderInit()
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(width, height);
-    renderer.outputEncoding = THREE.sRGBEncoding;
     document.body.appendChild(renderer.domElement);
 
     cylinderGeom = new THREE.CylinderGeometry(1, 1, 1, 32, 1);
@@ -235,32 +237,6 @@ function renderInit()
     heroScene = createHeroScene();
     hitboxScene = createHitboxScene();
     screenScene = createScreenScene();
-}
-
-function startRendering()
-{
-    const loader = new THREE.GLTFLoader();
-
-    loader.load("/models/MESH_PC_BloodEagleLight_A.glb",
-        gltf => {
-            gltf.scene.scale.set(100, 100, 100);
-            gltf.scene.rotation.x = Math.PI / 2;
-            gltf.scene.updateWorldMatrix(true, true);
-            updateBones(gltf.scene);
-            heroModel = gltf.scene;
-
-            $.getJSON("/json/SK_Mannequin_PhysicsAsset_Light.json", data => {
-                hitboxes = data[0].Properties.SkeletalBodySetups.map(obj => {
-                    const split = obj.ObjectPath.split('.');
-                    const index = split[split.length - 1];
-                    return data[index].Properties;
-                });
-                renderInit();
-                renderLoop();
-            });
-        },
-        undefined,
-        error => console.error(error));
 }
 
 function updateCamera()
@@ -285,5 +261,25 @@ document.onmousemove = function(event)
 
 $(function()
 {
-    startRendering();
+    new GLTFLoader().load("/models/MESH_PC_BloodEagleLight_A.glb",
+        gltf => {
+            heroModel = gltf.scene;
+
+            heroModel.scale.set(100, 100, 100);
+            heroModel.rotation.x = Math.PI / 2;
+            heroModel.updateWorldMatrix(true, true);
+            updateBones(heroModel);
+
+            $.getJSON("/json/SK_Mannequin_PhysicsAsset_Light.json", data => {
+                hitboxes = data[0].Properties.SkeletalBodySetups.map(obj => {
+                    const split = obj.ObjectPath.split('.');
+                    const index = split[split.length - 1];
+                    return data[index].Properties;
+                });
+                renderInit();
+                renderLoop();
+            });
+        },
+        undefined,
+        error => console.error(error));
 });
