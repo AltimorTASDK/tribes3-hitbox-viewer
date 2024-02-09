@@ -9,7 +9,6 @@ const ROTATION_SENSITIVITY = 0.3;
 let renderer = null;
 let camera = null;
 let camera2d = null;
-let heroModel = null;
 let bones = {};
 let hitboxes = [];
 
@@ -44,9 +43,9 @@ function quaternionInverse(quat)
 
 function rotateVectorByQuaternion(vector, rotation)
 {
-    let point = {X: vector.X, Y: vector.Y, Z: vector.Z, W: 0};
-    let inverse = quaternionInverse(rotation);
-    let rotated = hamiltonProduct(hamiltonProduct(rotation, point), inverse);
+    const point = {X: vector.X, Y: vector.Y, Z: vector.Z, W: 0};
+    const inverse = quaternionInverse(rotation);
+    const rotated = hamiltonProduct(hamiltonProduct(rotation, point), inverse);
     return {X: rotated.X, Y: rotated.Y, Z: rotated.Z};
 }
 
@@ -74,7 +73,7 @@ function rotatorToQuat(rotator)
 
 function boneTransform(bone, point)
 {
-    const world = bone.localToWorld(new THREE.Vector3(point.X / 100, point.Z / 100, point.Y / 100));
+    const world = bone.localToWorld(new THREE.Vector3(point.X, point.Z, point.Y));
     return {X: world.x, Y: world.y, Z: world.z};
 }
 
@@ -108,8 +107,8 @@ function createSphyl(scene, material, start, end, radius)
 
 function createHitbox(scene, material, hitbox)
 {
-    if (hitbox.BoneName !== "upperarm_l" && hitbox.BoneName !== "upperarm_r")
-        return;
+    //if (hitbox.BoneName !== "upperarm_l" && hitbox.BoneName !== "upperarm_r")
+        //return;
 
     const bone = bones[hitbox.BoneName];
 
@@ -168,12 +167,17 @@ function renderLoop()
 function addLights(scene)
 {
     scene.add(new THREE.AmbientLight(0x404040));
-    const light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
-    light.position.set(200, 0, 200);
-    scene.add(light);
+
+    const light1 = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+    light1.position.set(200, 0, 100);
+    scene.add(light1);
+
+    const light2 = new THREE.DirectionalLight(0xFFFFFF, 0.5);
+    light2.position.set(-200, 0, 100);
+    scene.add(light2);
 }
 
-function createHeroScene()
+function createHeroScene(heroModel)
 {
     const scene = new THREE.Scene();
     addLights(scene);
@@ -220,7 +224,7 @@ function updateCamera()
     camera.position.z += 100;
 }
 
-function renderInit()
+function renderInit(heroModel)
 {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -232,17 +236,18 @@ function renderInit()
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(width, height);
+    renderer.setClearAlpha(0.0);
     document.body.appendChild(renderer.domElement);
 
-    cylinderGeom = new THREE.CylinderGeometry(1, 1, 1, 32, 1);
+    cylinderGeom   = new THREE.CylinderGeometry(1, 1, 1, 32, 1);
     halfSphereGeom = new THREE.SphereGeometry(1, 16, 16, Math.PI, Math.PI);
-    sphereGeom = new THREE.SphereGeometry(1, 16, 16);
-    boxGeom = new THREE.BoxGeometry(1, 1, 1);
+    sphereGeom     = new THREE.SphereGeometry(1, 16, 16);
+    boxGeom        = new THREE.BoxGeometry(1, 1, 1);
 
-    heroRt = new THREE.WebGLRenderTarget(width, height);
-    hitboxRt = new THREE.WebGLRenderTarget(width, height);
+    heroRt   = new THREE.WebGLRenderTarget(width, height, {type: THREE.FloatType});
+    hitboxRt = new THREE.WebGLRenderTarget(width, height, {type: THREE.FloatType});
 
-    heroScene = createHeroScene();
+    heroScene   = createHeroScene(heroModel);
     hitboxScene = createHitboxScene();
     screenScene = createScreenScene();
 }
@@ -259,14 +264,12 @@ document.onmousemove = function(event)
 
 $(function()
 {
-    new GLTFLoader().load("/models/MESH_PC_BloodEagleLight_A.gltf",
+    new GLTFLoader().load("/models/MESH_PC_BloodEagleLight_A.glb",
         gltf => {
-            heroModel = gltf.scene;
-
-            heroModel.scale.set(100, 100, 100);
-            heroModel.rotation.x = Math.PI / 2;
-            heroModel.updateWorldMatrix(true, true);
-            updateBones(heroModel);
+            gltf.scene.rotation.x = Math.PI / 2;
+            gltf.scene.rotation.y = Math.PI / 2;
+            gltf.scene.updateWorldMatrix(true, true);
+            updateBones(gltf.scene);
 
             $.getJSON("/json/SK_Mannequin_PhysicsAsset_Light.json", data => {
                 hitboxes = data[0].Properties.SkeletalBodySetups.map(object => {
@@ -274,7 +277,7 @@ $(function()
                     const index = split[split.length - 1];
                     return data[index].Properties;
                 });
-                renderInit();
+                renderInit(gltf.scene);
                 renderLoop();
             });
         },
