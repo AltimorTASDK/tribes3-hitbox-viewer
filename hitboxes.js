@@ -59,10 +59,10 @@ function rotatorToQuat(rotator)
 {
     const sp = Math.sin(rotator.Pitch * Math.PI / 360);
     const cp = Math.cos(rotator.Pitch * Math.PI / 360);
-    const sy = Math.sin(rotator.Yaw * Math.PI / 360);
-    const cy = Math.cos(rotator.Yaw * Math.PI / 360);
-    const sr = Math.sin(rotator.Roll * Math.PI / 360);
-    const cr = Math.cos(rotator.Roll * Math.PI / 360);
+    const sy = Math.sin(rotator.Yaw   * Math.PI / 360);
+    const cy = Math.cos(rotator.Yaw   * Math.PI / 360);
+    const sr = Math.sin(rotator.Roll  * Math.PI / 360);
+    const cr = Math.cos(rotator.Roll  * Math.PI / 360);
 
     return {
         X:  cr * sp * sy - sr * cp * cy,
@@ -210,15 +210,23 @@ function createScreenScene()
     return scene;
 }
 
+function updateCamera()
+{
+    const quat = rotatorToQuat(cameraRotation);
+    camera.quaternion.set(quat.X, quat.Y, quat.Z, quat.W);
+    camera.quaternion.multiply(new THREE.Quaternion(0.5, 0.5, 0.5, 0.5));
+    camera.position.set(0, 0, 200);
+    camera.position.applyQuaternion(camera.quaternion);
+    camera.position.z += 100;
+}
+
 function renderInit()
 {
     const width = window.innerWidth;
     const height = window.innerHeight;
+
     camera = new THREE.PerspectiveCamera(74, width / height, 0.1, 1000);
-    camera.position.x = 200;
-    camera.position.z = 100;
-    camera.rotation.y = Math.PI / 2;
-    camera.rotation.z = Math.PI / 2;
+    updateCamera();
 
     camera2d = new THREE.OrthographicCamera(-50, 50, 50, -50, 0, 1);
 
@@ -239,16 +247,6 @@ function renderInit()
     screenScene = createScreenScene();
 }
 
-function updateCamera()
-{
-    const quat = rotatorToQuat(cameraRotation);
-    camera.quaternion.set(quat.X, quat.Y, quat.Z, quat.W);
-    camera.quaternion.multiply(new THREE.Quaternion(0.5, 0.5, 0.5, 0.5));
-    camera.position.set(0, 0, 200);
-    camera.position.applyQuaternion(camera.quaternion);
-    camera.position.z += 100;
-}
-
 document.onmousemove = function(event)
 {
     if (camera == null || !(event.buttons & 1))
@@ -261,7 +259,7 @@ document.onmousemove = function(event)
 
 $(function()
 {
-    new GLTFLoader().load("/models/MESH_PC_BloodEagleLight_A.glb",
+    new GLTFLoader().load("/models/MESH_PC_BloodEagleLight_A.gltf",
         gltf => {
             heroModel = gltf.scene;
 
@@ -271,8 +269,8 @@ $(function()
             updateBones(heroModel);
 
             $.getJSON("/json/SK_Mannequin_PhysicsAsset_Light.json", data => {
-                hitboxes = data[0].Properties.SkeletalBodySetups.map(obj => {
-                    const split = obj.ObjectPath.split('.');
+                hitboxes = data[0].Properties.SkeletalBodySetups.map(object => {
+                    const split = object.ObjectPath.split('.');
                     const index = split[split.length - 1];
                     return data[index].Properties;
                 });
