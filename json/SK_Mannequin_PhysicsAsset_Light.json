@@ -1,0 +1,1637 @@
+[
+  {
+    "Type": "PhysicsAsset",
+    "Name": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsAsset'",
+    "Properties": {
+      "BoundsBodies": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "SkeletalBodySetups": [
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_1'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.14"
+        },
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_2'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.19"
+        },
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_6'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.24"
+        },
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_9'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.25"
+        },
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_10'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.15"
+        },
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_16'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.17"
+        },
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_19'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.18"
+        },
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_22'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.20"
+        },
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_23'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.21"
+        },
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_25'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.22"
+        },
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_28'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.23"
+        },
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_0'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.13"
+        },
+        {
+          "ObjectName": "SkeletalBodySetup'SK_Mannequin_PhysicsAsset_Light:SkeletalBodySetup_11'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.16"
+        }
+      ],
+      "ConstraintSetup": [
+        {
+          "ObjectName": "PhysicsConstraintTemplate'SK_Mannequin_PhysicsAsset_Light:PhysicsConstraintTemplate_32'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.11"
+        },
+        {
+          "ObjectName": "PhysicsConstraintTemplate'SK_Mannequin_PhysicsAsset_Light:PhysicsConstraintTemplate_18'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.3"
+        },
+        {
+          "ObjectName": "PhysicsConstraintTemplate'SK_Mannequin_PhysicsAsset_Light:PhysicsConstraintTemplate_19'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.4"
+        },
+        {
+          "ObjectName": "PhysicsConstraintTemplate'SK_Mannequin_PhysicsAsset_Light:PhysicsConstraintTemplate_21'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.5"
+        },
+        {
+          "ObjectName": "PhysicsConstraintTemplate'SK_Mannequin_PhysicsAsset_Light:PhysicsConstraintTemplate_22'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.6"
+        },
+        {
+          "ObjectName": "PhysicsConstraintTemplate'SK_Mannequin_PhysicsAsset_Light:PhysicsConstraintTemplate_23'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.7"
+        },
+        {
+          "ObjectName": "PhysicsConstraintTemplate'SK_Mannequin_PhysicsAsset_Light:PhysicsConstraintTemplate_26'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.8"
+        },
+        {
+          "ObjectName": "PhysicsConstraintTemplate'SK_Mannequin_PhysicsAsset_Light:PhysicsConstraintTemplate_30'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.9"
+        },
+        {
+          "ObjectName": "PhysicsConstraintTemplate'SK_Mannequin_PhysicsAsset_Light:PhysicsConstraintTemplate_31'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.10"
+        },
+        {
+          "ObjectName": "PhysicsConstraintTemplate'SK_Mannequin_PhysicsAsset_Light:PhysicsConstraintTemplate_38'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.12"
+        },
+        {
+          "ObjectName": "PhysicsConstraintTemplate'SK_Mannequin_PhysicsAsset_Light:PhysicsConstraintTemplate_0'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.1"
+        },
+        {
+          "ObjectName": "PhysicsConstraintTemplate'SK_Mannequin_PhysicsAsset_Light:PhysicsConstraintTemplate_13'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/SK_Mannequin_PhysicsAsset_Light.2"
+        }
+      ],
+      "SolverSettings": {
+        "CullDistance": 1.0,
+        "bUseLinearJointSolver": false
+      },
+      "ThumbnailInfo": null
+    }
+  },
+  {
+    "Type": "PhysicsConstraintTemplate",
+    "Name": "PhysicsConstraintTemplate_0",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsConstraintTemplate'",
+    "Properties": {
+      "DefaultInstance": {
+        "JointName": "UserConstraint_1",
+        "ConstraintBone1": "hand_l",
+        "ConstraintBone2": "lowerarm_l",
+        "Pos2": {
+          "X": 26.975143,
+          "Y": -1.5729675E-09,
+          "Z": -9.620749E-09
+        },
+        "PriAxis2": {
+          "X": 0.9990225,
+          "Y": 0.007193807,
+          "Z": -0.043616038
+        },
+        "SecAxis2": {
+          "X": 0.040685613,
+          "Y": 0.23618409,
+          "Z": 0.970856
+        },
+        "ProfileInstance": {
+          "ConeLimit": {
+            "Swing1LimitDegrees": 90.0,
+            "Swing2LimitDegrees": 30.0,
+            "Swing1Motion": "EAngularConstraintMotion::ACM_Limited",
+            "Swing2Motion": "EAngularConstraintMotion::ACM_Limited"
+          },
+          "TwistLimit": {
+            "TwistMotion": "EAngularConstraintMotion::ACM_Limited"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "PhysicsConstraintTemplate",
+    "Name": "PhysicsConstraintTemplate_13",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsConstraintTemplate'",
+    "Properties": {
+      "DefaultInstance": {
+        "JointName": "hand_r",
+        "ConstraintBone1": "hand_r",
+        "ConstraintBone2": "lowerarm_r",
+        "PriAxis1": {
+          "X": -1.0,
+          "Y": -1.9531456E-06,
+          "Z": -3.6404545E-06
+        },
+        "SecAxis1": {
+          "X": 1.9531406E-06,
+          "Y": -1.0,
+          "Z": 1.3723337E-06
+        },
+        "Pos2": {
+          "X": -26.975245,
+          "Y": -2.5634119E-05,
+          "Z": -1.1905385E-06
+        },
+        "PriAxis2": {
+          "X": -0.9990226,
+          "Y": -0.0071907407,
+          "Z": 0.043613292
+        },
+        "SecAxis2": {
+          "X": -0.040683646,
+          "Y": -0.23618506,
+          "Z": -0.9708561
+        },
+        "ProfileInstance": {
+          "ConeLimit": {
+            "Swing1LimitDegrees": 90.0,
+            "Swing2LimitDegrees": 30.0,
+            "Swing1Motion": "EAngularConstraintMotion::ACM_Limited",
+            "Swing2Motion": "EAngularConstraintMotion::ACM_Limited"
+          },
+          "TwistLimit": {
+            "TwistMotion": "EAngularConstraintMotion::ACM_Limited"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "PhysicsConstraintTemplate",
+    "Name": "PhysicsConstraintTemplate_18",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsConstraintTemplate'",
+    "Properties": {
+      "DefaultInstance": {
+        "JointName": "UserConstraint",
+        "ConstraintBone1": "thigh_r",
+        "ConstraintBone2": "pelvis",
+        "Pos1": {
+          "X": 7.3357346E-06,
+          "Y": 3.8346067E-07,
+          "Z": 1.4950001E-12
+        },
+        "PriAxis1": {
+          "X": -1.0,
+          "Y": 5.0243198E-06,
+          "Z": -5.942568E-07
+        },
+        "SecAxis1": {
+          "X": -5.0243198E-06,
+          "Y": -1.0,
+          "Z": -7.9685535E-08
+        },
+        "Pos2": {
+          "X": -1.4486485,
+          "Y": 0.5314276,
+          "Z": 9.005801
+        },
+        "PriAxis2": {
+          "X": 0.9921301,
+          "Y": 0.026243063,
+          "Z": -0.12243026
+        },
+        "SecAxis2": {
+          "X": -0.007923209,
+          "Y": 0.9889879,
+          "Z": 0.14778388
+        },
+        "ProfileInstance": {
+          "ConeLimit": {
+            "Swing1LimitDegrees": 35.0,
+            "Swing2LimitDegrees": 10.0,
+            "Swing1Motion": "EAngularConstraintMotion::ACM_Limited",
+            "Swing2Motion": "EAngularConstraintMotion::ACM_Locked"
+          },
+          "TwistLimit": {
+            "TwistLimitDegrees": 5.0,
+            "TwistMotion": "EAngularConstraintMotion::ACM_Locked"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "PhysicsConstraintTemplate",
+    "Name": "PhysicsConstraintTemplate_19",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsConstraintTemplate'",
+    "Properties": {
+      "DefaultInstance": {
+        "JointName": "UserConstraint_0",
+        "ConstraintBone1": "calf_r",
+        "ConstraintBone2": "thigh_r",
+        "Pos1": {
+          "X": 2.9126173E-05,
+          "Y": -4.1198923E-06,
+          "Z": 1.9930477E-12
+        },
+        "PriAxis1": {
+          "X": -0.9961886,
+          "Y": 0.08722564,
+          "Z": -2.45123E-07
+        },
+        "SecAxis1": {
+          "X": -0.08722564,
+          "Y": -0.9961886,
+          "Z": -1.1589417E-06
+        },
+        "Pos2": {
+          "X": 42.572266,
+          "Y": 9.536743E-07,
+          "Z": 1.1444092E-05
+        },
+        "PriAxis2": {
+          "X": -0.9981553,
+          "Y": -0.045862254,
+          "Z": 0.0397831
+        },
+        "SecAxis2": {
+          "X": 0.041832894,
+          "Y": -0.99442476,
+          "Z": -0.09679578
+        },
+        "ProfileInstance": {
+          "ConeLimit": {
+            "Swing1LimitDegrees": 35.0,
+            "Swing2LimitDegrees": 10.0,
+            "Swing1Motion": "EAngularConstraintMotion::ACM_Limited",
+            "Swing2Motion": "EAngularConstraintMotion::ACM_Limited"
+          },
+          "TwistLimit": {
+            "TwistLimitDegrees": 5.0,
+            "TwistMotion": "EAngularConstraintMotion::ACM_Locked"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "PhysicsConstraintTemplate",
+    "Name": "PhysicsConstraintTemplate_21",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsConstraintTemplate'",
+    "Properties": {
+      "DefaultInstance": {
+        "JointName": "UserConstraint_2",
+        "ConstraintBone1": "head",
+        "ConstraintBone2": "spine_02",
+        "Pos2": {
+          "X": 38.77541,
+          "Y": 2.076753,
+          "Z": -3.8146973E-06
+        },
+        "PriAxis2": {
+          "X": 0.99559474,
+          "Y": 0.09376114,
+          "Z": -9.652229E-09
+        },
+        "SecAxis2": {
+          "X": -0.09376114,
+          "Y": 0.99559474,
+          "Z": -3.2758987E-09
+        },
+        "ProfileInstance": {
+          "ConeLimit": {
+            "Swing1LimitDegrees": 30.0,
+            "Swing2LimitDegrees": 30.0,
+            "Swing1Motion": "EAngularConstraintMotion::ACM_Limited",
+            "Swing2Motion": "EAngularConstraintMotion::ACM_Limited"
+          },
+          "TwistLimit": {
+            "TwistLimitDegrees": 15.0,
+            "TwistMotion": "EAngularConstraintMotion::ACM_Limited"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "PhysicsConstraintTemplate",
+    "Name": "PhysicsConstraintTemplate_22",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsConstraintTemplate'",
+    "Properties": {
+      "DefaultInstance": {
+        "JointName": "UserConstraint_3",
+        "ConstraintBone1": "thigh_l",
+        "ConstraintBone2": "pelvis",
+        "Pos2": {
+          "X": -1.4488287,
+          "Y": 0.5314235,
+          "Z": -9.005808
+        },
+        "PriAxis2": {
+          "X": 0.99213016,
+          "Y": 0.026247913,
+          "Z": 0.12242867
+        },
+        "SecAxis2": {
+          "X": -0.0079281945,
+          "Y": 0.9889878,
+          "Z": -0.14778453
+        },
+        "ProfileInstance": {
+          "ConeLimit": {
+            "Swing1LimitDegrees": 35.0,
+            "Swing2LimitDegrees": 10.0,
+            "Swing1Motion": "EAngularConstraintMotion::ACM_Limited",
+            "Swing2Motion": "EAngularConstraintMotion::ACM_Locked"
+          },
+          "TwistLimit": {
+            "TwistLimitDegrees": 5.0,
+            "TwistMotion": "EAngularConstraintMotion::ACM_Locked"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "PhysicsConstraintTemplate",
+    "Name": "PhysicsConstraintTemplate_23",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsConstraintTemplate'",
+    "Properties": {
+      "DefaultInstance": {
+        "JointName": "UserConstraint_4",
+        "ConstraintBone1": "calf_l",
+        "ConstraintBone2": "thigh_l",
+        "Pos1": {
+          "X": -1.7562998E-07,
+          "Y": -6.4439746E-07,
+          "Z": -7.437484E-12
+        },
+        "PriAxis1": {
+          "X": 0.99619097,
+          "Y": -0.08719864,
+          "Z": -7.18413E-07
+        },
+        "SecAxis1": {
+          "X": 0.08719864,
+          "Y": 0.99619097,
+          "Z": 1.2118935E-06
+        },
+        "Pos2": {
+          "X": -42.572044,
+          "Y": 7.1525574E-07,
+          "Z": 0.0
+        },
+        "PriAxis2": {
+          "X": 0.9981541,
+          "Y": 0.045889303,
+          "Z": -0.039781503
+        },
+        "SecAxis2": {
+          "X": -0.041859943,
+          "Y": 0.9944235,
+          "Z": 0.09679691
+        },
+        "ProfileInstance": {
+          "ConeLimit": {
+            "Swing1LimitDegrees": 35.0,
+            "Swing2LimitDegrees": 10.0,
+            "Swing1Motion": "EAngularConstraintMotion::ACM_Limited",
+            "Swing2Motion": "EAngularConstraintMotion::ACM_Limited"
+          },
+          "TwistLimit": {
+            "TwistLimitDegrees": 5.0,
+            "TwistMotion": "EAngularConstraintMotion::ACM_Locked"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "PhysicsConstraintTemplate",
+    "Name": "PhysicsConstraintTemplate_26",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsConstraintTemplate'",
+    "Properties": {
+      "DefaultInstance": {
+        "JointName": "UserConstraint_6",
+        "ConstraintBone1": "lowerarm_l",
+        "ConstraintBone2": "upperarm_l",
+        "Pos2": {
+          "X": 30.33994,
+          "Y": 1.1920929E-07,
+          "Z": 0.0
+        },
+        "PriAxis2": {
+          "X": 0.8486908,
+          "Y": 0.49714512,
+          "Z": 0.18047364
+        },
+        "SecAxis2": {
+          "X": -0.5142538,
+          "Y": 0.8553951,
+          "Z": 0.061987035
+        },
+        "ProfileInstance": {
+          "ConeLimit": {
+            "Swing1LimitDegrees": 30.0,
+            "Swing1Motion": "EAngularConstraintMotion::ACM_Limited",
+            "Swing2Motion": "EAngularConstraintMotion::ACM_Locked"
+          },
+          "TwistLimit": {
+            "TwistLimitDegrees": 5.0,
+            "TwistMotion": "EAngularConstraintMotion::ACM_Limited"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "PhysicsConstraintTemplate",
+    "Name": "PhysicsConstraintTemplate_30",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsConstraintTemplate'",
+    "Properties": {
+      "DefaultInstance": {
+        "JointName": "UserConstraint_8",
+        "ConstraintBone1": "upperarm_l",
+        "ConstraintBone2": "spine_02",
+        "Pos2": {
+          "X": 23.567768,
+          "Y": -5.4826245,
+          "Z": -17.700212
+        },
+        "PriAxis2": {
+          "X": -0.747216,
+          "Y": -0.16078043,
+          "Z": -0.64483964
+        },
+        "SecAxis2": {
+          "X": -0.15339574,
+          "Y": 0.985819,
+          "Z": -0.06804896
+        },
+        "ProfileInstance": {
+          "ConeLimit": {
+            "Swing1LimitDegrees": 35.0,
+            "Swing2LimitDegrees": 35.0,
+            "Swing1Motion": "EAngularConstraintMotion::ACM_Limited",
+            "Swing2Motion": "EAngularConstraintMotion::ACM_Limited"
+          },
+          "TwistLimit": {
+            "TwistLimitDegrees": 20.0,
+            "TwistMotion": "EAngularConstraintMotion::ACM_Limited"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "PhysicsConstraintTemplate",
+    "Name": "PhysicsConstraintTemplate_31",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsConstraintTemplate'",
+    "Properties": {
+      "DefaultInstance": {
+        "JointName": "UserConstraint_9",
+        "ConstraintBone1": "upperarm_r",
+        "ConstraintBone2": "spine_02",
+        "Pos2": {
+          "X": 23.567896,
+          "Y": -5.482587,
+          "Z": 17.70017
+        },
+        "PriAxis2": {
+          "X": 0.74721587,
+          "Y": 0.16078043,
+          "Z": -0.6448395
+        },
+        "SecAxis2": {
+          "X": 0.15339571,
+          "Y": -0.98581886,
+          "Z": -0.068048984
+        },
+        "ProfileInstance": {
+          "ConeLimit": {
+            "Swing1LimitDegrees": 35.0,
+            "Swing2LimitDegrees": 35.0,
+            "Swing1Motion": "EAngularConstraintMotion::ACM_Limited",
+            "Swing2Motion": "EAngularConstraintMotion::ACM_Limited"
+          },
+          "TwistLimit": {
+            "TwistLimitDegrees": 20.0,
+            "TwistMotion": "EAngularConstraintMotion::ACM_Limited"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "PhysicsConstraintTemplate",
+    "Name": "PhysicsConstraintTemplate_32",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsConstraintTemplate'",
+    "Properties": {
+      "DefaultInstance": {
+        "JointName": "spine_02",
+        "ConstraintBone1": "spine_02",
+        "ConstraintBone2": "pelvis",
+        "Pos1": {
+          "X": -19.126757,
+          "Y": -1.5104009E-05,
+          "Z": -5.16528E-06
+        },
+        "PriAxis1": {
+          "X": 1.0,
+          "Y": -6.938894E-18,
+          "Z": 1.6479873E-17
+        },
+        "SecAxis1": {
+          "X": 6.938894E-18,
+          "Y": 1.0,
+          "Z": 6.938894E-18
+        },
+        "Pos2": {
+          "X": 11.020245,
+          "Y": 1.7279465,
+          "Z": -2.4238769E-05
+        },
+        "PriAxis2": {
+          "X": 0.9927371,
+          "Y": -0.12030389,
+          "Z": 2.700552E-07
+        },
+        "SecAxis2": {
+          "X": 0.12030389,
+          "Y": 0.9927371,
+          "Z": -9.863193E-06
+        },
+        "ProfileInstance": {
+          "ConeLimit": {
+            "Swing1LimitDegrees": 30.0,
+            "Swing2LimitDegrees": 30.0,
+            "Swing1Motion": "EAngularConstraintMotion::ACM_Limited",
+            "Swing2Motion": "EAngularConstraintMotion::ACM_Limited"
+          },
+          "TwistLimit": {
+            "TwistLimitDegrees": 20.839998,
+            "TwistMotion": "EAngularConstraintMotion::ACM_Limited"
+          },
+          "bDisableCollision": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "PhysicsConstraintTemplate",
+    "Name": "PhysicsConstraintTemplate_38",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'PhysicsConstraintTemplate'",
+    "Properties": {
+      "DefaultInstance": {
+        "JointName": "UserConstraint_10",
+        "ConstraintBone1": "lowerarm_r",
+        "ConstraintBone2": "upperarm_r",
+        "Pos2": {
+          "X": -30.340052,
+          "Y": 4.2915344E-06,
+          "Z": 7.6293945E-06
+        },
+        "PriAxis2": {
+          "X": 0.84869087,
+          "Y": 0.49714497,
+          "Z": 0.18047361
+        },
+        "SecAxis2": {
+          "X": -0.5142537,
+          "Y": 0.8553951,
+          "Z": 0.061987054
+        },
+        "ProfileInstance": {
+          "ConeLimit": {
+            "Swing1LimitDegrees": 30.0,
+            "Swing1Motion": "EAngularConstraintMotion::ACM_Limited",
+            "Swing2Motion": "EAngularConstraintMotion::ACM_Locked"
+          },
+          "TwistLimit": {
+            "TwistLimitDegrees": 5.0,
+            "TwistMotion": "EAngularConstraintMotion::ACM_Limited"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_0",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": false,
+            "OrientationStrength": 10000.0,
+            "AngularVelocityStrength": 10000.0,
+            "PositionStrength": 10000.0,
+            "VelocityStrength": 10000.0,
+            "MaxLinearForce": 1000.0,
+            "MaxAngularForce": 1000.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "BoxElems": [
+          {
+            "Center": {
+              "X": 8.111967,
+              "Y": -1.9459507,
+              "Z": 0.6346987
+            },
+            "Rotation": {
+              "Pitch": -8.565511E-05,
+              "Yaw": -9.999954,
+              "Roll": -6.744129E-05
+            },
+            "X": 23.0,
+            "Y": 7.5,
+            "Z": 11.0,
+            "RestOffset": 0.0,
+            "Name": "hand_l_box",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::PhysicsOnly"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "bOverrideMass": true
+      },
+      "BoneName": "hand_l",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "EDEC58A1401C5DE7BE0EE689A4005E24"
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_1",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "bSkipScaleFromAnimation": true,
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 2000.0,
+            "AngularVelocityStrength": 200.0,
+            "PositionStrength": 2000.0,
+            "VelocityStrength": 200.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "SphylElems": [
+          {
+            "Center": {
+              "X": -7.1918497,
+              "Y": -1.3341043,
+              "Z": 0.00021491988
+            },
+            "Rotation": {
+              "Pitch": -9.541664E-15,
+              "Yaw": 93.99989,
+              "Roll": -90.0
+            },
+            "Radius": 15.0,
+            "Length": 6.0,
+            "RestOffset": 0.0,
+            "Name": "None",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::PhysicsOnly"
+          },
+          {
+            "Center": {
+              "X": 17.235321,
+              "Y": -3.1168609,
+              "Z": -0.020645339
+            },
+            "Rotation": {
+              "Pitch": -6.830189E-06,
+              "Yaw": -92.779396,
+              "Roll": -4.3915543E-06
+            },
+            "Radius": 15.0,
+            "Length": 20.0,
+            "RestOffset": 0.0,
+            "Name": "None",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::QueryAndPhysics"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "MassInKgOverride": 500.0,
+        "LinearDamping": 1.0,
+        "AngularDamping": 1.0,
+        "PhysMaterialOverride": {
+          "ObjectName": "PhysicalMaterial'HealthPhysicalMaterial'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/HealthPhysicalMaterial.0"
+        },
+        "bOverrideMass": true
+      },
+      "BoneName": "spine_02",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "C66EC59445FEE7FA8B49A183FA2592C5"
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_10",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "bSkipScaleFromAnimation": true,
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": false,
+            "OrientationStrength": 4000.0,
+            "AngularVelocityStrength": 400.0,
+            "PositionStrength": 4000.0,
+            "VelocityStrength": 400.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "SphylElems": [
+          {
+            "Center": {
+              "X": -13.703451,
+              "Y": 0.4862148,
+              "Z": -0.42332843
+            },
+            "Rotation": {
+              "Pitch": 13.360673,
+              "Yaw": 90.65411,
+              "Roll": -87.26584
+            },
+            "Radius": 5.0,
+            "Length": 21.75,
+            "RestOffset": 0.0,
+            "Name": "None",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::PhysicsOnly"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "MassInKgOverride": 20.0,
+        "LinearDamping": 1.0,
+        "AngularDamping": 1.0,
+        "PhysMaterialOverride": {
+          "ObjectName": "PhysicalMaterial'HealthPhysicalMaterial'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/HealthPhysicalMaterial.0"
+        },
+        "bOverrideMass": true
+      },
+      "BoneName": "lowerarm_r",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "4953DBFA4FB365B80D34A7B5E0EE40AB"
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_11",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": false,
+            "OrientationStrength": 10000.0,
+            "AngularVelocityStrength": 10000.0,
+            "PositionStrength": 10000.0,
+            "VelocityStrength": 10000.0,
+            "MaxLinearForce": 1000.0,
+            "MaxAngularForce": 1000.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "BoxElems": [
+          {
+            "Center": {
+              "X": -8.111967,
+              "Y": 1.9459507,
+              "Z": -0.6346987
+            },
+            "Rotation": {
+              "Pitch": -8.565511E-05,
+              "Yaw": -9.999954,
+              "Roll": 179.99994
+            },
+            "X": 23.0,
+            "Y": 7.5,
+            "Z": 11.0,
+            "RestOffset": 0.0,
+            "Name": "hand_l_box",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::PhysicsOnly"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "bOverrideMass": true
+      },
+      "BoneName": "hand_r",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "E5009C3C45B04DEB6D3CD181AFC2AC2B"
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_16",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "bSkipScaleFromAnimation": true,
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 500.0,
+            "AngularVelocityStrength": 50.0,
+            "PositionStrength": 500.0,
+            "VelocityStrength": 50.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "SphylElems": [
+          {
+            "Center": {
+              "X": 3.326922,
+              "Y": 2.57887,
+              "Z": 7E-06
+            },
+            "Rotation": {
+              "Pitch": -6.9E-05,
+              "Yaw": -80.66359,
+              "Roll": 89.999535
+            },
+            "Radius": 12.0,
+            "Length": 10.0,
+            "RestOffset": 0.0,
+            "Name": "None",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::PhysicsOnly"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "bNotifyRigidBodyCollision": true,
+        "MassInKgOverride": 50.0,
+        "LinearDamping": 1.0,
+        "AngularDamping": 1.0,
+        "PhysMaterialOverride": {
+          "ObjectName": "PhysicalMaterial'HealthPhysicalMaterial'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/HealthPhysicalMaterial.0"
+        },
+        "bOverrideMass": true
+      },
+      "BoneName": "head",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "BA00A572406608E54C06368C91CF43A0"
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_19",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "bSkipScaleFromAnimation": true,
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 2000.0,
+            "AngularVelocityStrength": 200.0,
+            "PositionStrength": 2000.0,
+            "VelocityStrength": 200.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "SphylElems": [
+          {
+            "Center": {
+              "X": -28.134798,
+              "Y": -0.13057105,
+              "Z": 0.6477678
+            },
+            "Rotation": {
+              "Pitch": 0.3827223,
+              "Yaw": 89.74777,
+              "Roll": 89.24356
+            },
+            "Radius": 6.0,
+            "Length": 38.0,
+            "RestOffset": 0.0,
+            "Name": "None",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::PhysicsOnly"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "MassInKgOverride": 35.0,
+        "LinearDamping": 1.0,
+        "AngularDamping": 1.0,
+        "PhysMaterialOverride": {
+          "ObjectName": "PhysicalMaterial'HealthPhysicalMaterial'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/HealthPhysicalMaterial.0"
+        },
+        "bOverrideMass": true
+      },
+      "BoneName": "calf_l",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "837A51764DC78CAF812DB28954F21239"
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_2",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "bSkipScaleFromAnimation": true,
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 2000.0,
+            "AngularVelocityStrength": 200.0,
+            "PositionStrength": 2000.0,
+            "VelocityStrength": 200.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "SphylElems": [
+          {
+            "Center": {
+              "X": -0.32558373,
+              "Y": 5.6068114E-07,
+              "Z": 2.0990856E-09
+            },
+            "Rotation": {
+              "Pitch": -90.0,
+              "Yaw": 0.0,
+              "Roll": -9.8667944E-05
+            },
+            "Radius": 37.5,
+            "Length": 90.0,
+            "RestOffset": 0.0,
+            "Name": "hit_component",
+            "bContributeToMass": false,
+            "CollisionEnabled": "ECollisionEnabled::QueryAndProbe"
+          },
+          {
+            "Center": {
+              "X": 0.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "Rotation": {
+              "Pitch": 0.0,
+              "Yaw": 0.0,
+              "Roll": -0.0
+            },
+            "Radius": 15.0,
+            "Length": 0.0,
+            "RestOffset": 0.0,
+            "Name": "pelvis_capsule",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::QueryAndPhysics"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "MassInKgOverride": 250.0,
+        "LinearDamping": 1.0,
+        "AngularDamping": 1.0,
+        "PhysMaterialOverride": {
+          "ObjectName": "PhysicalMaterial'HealthPhysicalMaterial'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/HealthPhysicalMaterial.0"
+        },
+        "bOverrideMass": true
+      },
+      "BoneName": "pelvis",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "C16D3AA541B12763BC26F9BC367AB401"
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_22",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "bSkipScaleFromAnimation": true,
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": false,
+            "OrientationStrength": 3000.0,
+            "AngularVelocityStrength": 300.0,
+            "PositionStrength": 3000.0,
+            "VelocityStrength": 300.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "SphylElems": [
+          {
+            "Center": {
+              "X": 16.0727,
+              "Y": 0.57992,
+              "Z": 0.41232
+            },
+            "Rotation": {
+              "Pitch": -31.072838,
+              "Yaw": 93.51568,
+              "Roll": 81.16121
+            },
+            "Radius": 7.0,
+            "Length": 18.0,
+            "RestOffset": 0.0,
+            "Name": "None",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::PhysicsOnly"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "MassInKgOverride": 75.0,
+        "LinearDamping": 1.0,
+        "AngularDamping": 1.0,
+        "PhysMaterialOverride": {
+          "ObjectName": "PhysicalMaterial'HealthPhysicalMaterial'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/HealthPhysicalMaterial.0"
+        },
+        "bOverrideMass": true
+      },
+      "BoneName": "upperarm_l",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "1E3038D1490DE7CFC134BBA9D9B68D01"
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_23",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "bSkipScaleFromAnimation": true,
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": false,
+            "OrientationStrength": 4000.0,
+            "AngularVelocityStrength": 400.0,
+            "PositionStrength": 4000.0,
+            "VelocityStrength": 400.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "SphylElems": [
+          {
+            "Center": {
+              "X": 14.770854,
+              "Y": -1.0571667,
+              "Z": -0.18293412
+            },
+            "Rotation": {
+              "Pitch": 13.360684,
+              "Yaw": 90.65412,
+              "Roll": 92.73417
+            },
+            "Radius": 5.0,
+            "Length": 21.75,
+            "RestOffset": 0.0,
+            "Name": "None",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::PhysicsOnly"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "MassInKgOverride": 20.0,
+        "LinearDamping": 1.0,
+        "AngularDamping": 1.0,
+        "PhysMaterialOverride": {
+          "ObjectName": "PhysicalMaterial'HealthPhysicalMaterial'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/HealthPhysicalMaterial.0"
+        },
+        "bOverrideMass": true
+      },
+      "BoneName": "lowerarm_l",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "F3325AAE409F3CA1E27CDFAC11BA78A8"
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_25",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "bSkipScaleFromAnimation": true,
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 2000.0,
+            "AngularVelocityStrength": 200.0,
+            "PositionStrength": 2000.0,
+            "VelocityStrength": 200.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "SphylElems": [
+          {
+            "Center": {
+              "X": 28.577238,
+              "Y": -0.111687325,
+              "Z": -0.6552291
+            },
+            "Rotation": {
+              "Pitch": 0.38271743,
+              "Yaw": 89.74771,
+              "Roll": -90.75644
+            },
+            "Radius": 6.0,
+            "Length": 38.0,
+            "RestOffset": 0.0,
+            "Name": "None",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::PhysicsOnly"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "bNotifyRigidBodyCollision": true,
+        "MassInKgOverride": 35.0,
+        "LinearDamping": 1.0,
+        "AngularDamping": 1.0,
+        "PhysMaterialOverride": {
+          "ObjectName": "PhysicalMaterial'HealthPhysicalMaterial'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/HealthPhysicalMaterial.0"
+        },
+        "bOverrideMass": true
+      },
+      "BoneName": "calf_r",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "7B6CD4114609015D80E0368BFF7B6FC5"
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_28",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 2000.0,
+            "AngularVelocityStrength": 200.0,
+            "PositionStrength": 2000.0,
+            "VelocityStrength": 200.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "SphylElems": [
+          {
+            "Center": {
+              "X": -18.476011,
+              "Y": 2.5356221,
+              "Z": -1.296364
+            },
+            "Rotation": {
+              "Pitch": -0.9143936,
+              "Yaw": -96.07285,
+              "Roll": 92.891045
+            },
+            "Radius": 9.0,
+            "Length": 30.0,
+            "RestOffset": 0.0,
+            "Name": "None",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::PhysicsOnly"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "LinearDamping": 1.0,
+        "AngularDamping": 1.0,
+        "PhysMaterialOverride": {
+          "ObjectName": "PhysicalMaterial'HealthPhysicalMaterial'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/HealthPhysicalMaterial.0"
+        },
+        "bOverrideMass": true
+      },
+      "BoneName": "thigh_l",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "9518744D4EF5CB2C91C05EBE990B66E3"
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_6",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "bSkipScaleFromAnimation": true,
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 2000.0,
+            "AngularVelocityStrength": 200.0,
+            "PositionStrength": 2000.0,
+            "VelocityStrength": 200.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "SphylElems": [
+          {
+            "Center": {
+              "X": 18.476011,
+              "Y": -2.5356221,
+              "Z": 1.296364
+            },
+            "Rotation": {
+              "Pitch": -0.91440237,
+              "Yaw": -96.072784,
+              "Roll": -87.108955
+            },
+            "Radius": 9.0,
+            "Length": 30.0,
+            "RestOffset": 0.0,
+            "Name": "None",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::PhysicsOnly"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "LinearDamping": 1.0,
+        "AngularDamping": 1.0,
+        "PhysMaterialOverride": {
+          "ObjectName": "PhysicalMaterial'HealthPhysicalMaterial'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/HealthPhysicalMaterial.0"
+        },
+        "bOverrideMass": true
+      },
+      "BoneName": "thigh_r",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "71AC9E9A48379F401A30AA90DBC7F80B"
+  },
+  {
+    "Type": "SkeletalBodySetup",
+    "Name": "SkeletalBodySetup_9",
+    "Outer": "SK_Mannequin_PhysicsAsset_Light",
+    "Class": "UScriptClass'SkeletalBodySetup'",
+    "Properties": {
+      "bSkipScaleFromAnimation": true,
+      "PhysicalAnimationData": [
+        {
+          "ProfileName": "HitReact",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": false,
+            "OrientationStrength": 3000.0,
+            "AngularVelocityStrength": 300.0,
+            "PositionStrength": 3000.0,
+            "VelocityStrength": 300.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        },
+        {
+          "ProfileName": "New",
+          "PhysicalAnimationData": {
+            "BodyName": "None",
+            "bIsLocalSimulation": true,
+            "OrientationStrength": 0.0,
+            "AngularVelocityStrength": 0.0,
+            "PositionStrength": 0.0,
+            "VelocityStrength": 0.0,
+            "MaxLinearForce": 0.0,
+            "MaxAngularForce": 0.0
+          }
+        }
+      ],
+      "AggGeom": {
+        "SphylElems": [
+          {
+            "Center": {
+              "X": -16.072777,
+              "Y": -0.5799205,
+              "Z": -0.4123277
+            },
+            "Rotation": {
+              "Pitch": -31.072838,
+              "Yaw": 93.51568,
+              "Roll": -98.838776
+            },
+            "Radius": 7.0,
+            "Length": 18.0,
+            "RestOffset": 0.0,
+            "Name": "None",
+            "bContributeToMass": true,
+            "CollisionEnabled": "ECollisionEnabled::PhysicsOnly"
+          }
+        ]
+      },
+      "DefaultInstance": {
+        "MassInKgOverride": 75.0,
+        "LinearDamping": 1.0,
+        "AngularDamping": 1.0,
+        "PhysMaterialOverride": {
+          "ObjectName": "PhysicalMaterial'HealthPhysicalMaterial'",
+          "ObjectPath": "Topaz/Content/Mannequin/Character/Mesh/HealthPhysicalMaterial.0"
+        },
+        "bOverrideMass": true
+      },
+      "BoneName": "upperarm_r",
+      "CollisionTraceFlag": "ECollisionTraceFlag::CTF_UseSimpleAsComplex"
+    },
+    "BodySetupGuid": "933C5F6641EDAB899968E5B97E30E51B"
+  }
+]
