@@ -107,9 +107,6 @@ function createSphyl(scene, material, start, end, radius)
 
 function createHitbox(scene, material, hitbox)
 {
-    //if (hitbox.BoneName !== "upperarm_l" && hitbox.BoneName !== "upperarm_r")
-        //return;
-
     const bone = bones[hitbox.BoneName];
 
     hitbox.AggGeom.SphylElems?.forEach(elem => {
