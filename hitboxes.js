@@ -4,6 +4,10 @@ import 'jcanvas';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+const ARMOR_SCALE = 0.94;
+const ARMOR_MESH = "/models/MESH_PC_BloodEagleLight_A.glb";
+const ARMOR_JSON = "/json/SK_Mannequin_PhysicsAsset_Light.json";
+
 function hamiltonProduct(a, b)
 {
     return {
@@ -131,14 +135,13 @@ class CompositeScene extends Scene {
         this.#scenes = [];
 
         const gltfPromise = new Promise((resolve, reject) =>
-            new GLTFLoader().load("/models/MESH_PC_BloodEagleLight_A.glb",
+            new GLTFLoader().load(ARMOR_MESH,
                 gltf => resolve(gltf),
                 undefined,
                 error => console.error(error)));
 
         const jsonPromise = new Promise((resolve, reject) =>
-            $.getJSON("/json/SK_Mannequin_PhysicsAsset_Light.json",
-                json => resolve(json)));
+            $.getJSON(ARMOR_JSON, json => resolve(json)));
 
         Promise.all([gltfPromise, jsonPromise]).then(([gltf, json]) => {
             const bones = [];
@@ -187,7 +190,10 @@ class RenderTargetScene extends Scene {
 
     createRenderTargetMaterial()
     {
-        return new THREE.MeshBasicMaterial({map: this.renderTarget.texture});
+        return new THREE.MeshBasicMaterial({
+            map: this.renderTarget.texture,
+            transparent: true,
+        });
     }
 }
 
@@ -207,6 +213,7 @@ class CharacterScene extends RenderTargetScene {
         this.#gltf.scene.rotation.x = Math.PI / 2;
         this.#gltf.scene.rotation.y = Math.PI / 2;
         this.#gltf.scene.updateWorldMatrix(true, true);
+        this.#gltf.scene.scale.setScalar(ARMOR_SCALE);
         scene.add(this.#gltf.scene);
         return scene;
     }
@@ -261,13 +268,14 @@ class HitboxScene extends RenderTargetScene {
             const offset2 = rotateVectorByQuaternion({X: 0, Y: 0, Z: -elem.Length / 2}, rotation);
             const position1 = boneTransform(bone, vectorAdd(offset1, elem.Center));
             const position2 = boneTransform(bone, vectorAdd(offset2, elem.Center));
-            this.#createSphyl(scene, material, position1, position2, elem.Radius);
+            const radius = elem.Radius * ARMOR_SCALE;
+            this.#createSphyl(scene, material, position1, position2, radius);
         });
 
         hitbox.AggGeom.SphereElems?.filter(this.#filter)?.forEach(elem => {
             const center = boneTransform(bone, elem.Center);
             const sphere = new THREE.Mesh(HitboxScene.#sphereGeometry, material);
-            sphere.scale.set(elem.Radius, elem.Radius, elem.Radius);
+            sphere.scale.setScalar(elem.Radius * ARMOR_SCALE);
             sphere.position.set(center.X, center.Y, center.Z);
             scene.add(sphere);
         });
@@ -276,6 +284,7 @@ class HitboxScene extends RenderTargetScene {
             const center = boneTransform(bone, elem.Center);
             const box = new THREE.Mesh(HitboxScene.#boxGeometry, material);
             box.scale.set(elem.X, elem.Y, elem.Z);
+            box.scale.multiplyScalar(ARMOR_SCALE);
             bone.getWorldQuaternion(box.quaternion);
             box.rotateX(elem.Rotation.Pitch *  Math.PI / 180 + Math.PI / 2);
             box.rotateY(elem.Rotation.Yaw   *  Math.PI / 180);
@@ -318,25 +327,21 @@ function updateCamera(camera, cameraRotation)
     const quaternion = rotatorToQuaternion(cameraRotation);
     camera.quaternion.set(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
     camera.quaternion.multiply(new THREE.Quaternion(0.5, 0.5, 0.5, 0.5));
-    camera.position.set(0, 0, 400);
+    camera.position.set(0, 0, 700);
     camera.position.applyQuaternion(camera.quaternion);
     camera.position.z += 100;
-}
-
-function renderLoop(scene, renderer)
-{
-    scene.draw(renderer);
-    requestAnimationFrame(() => renderLoop(scene, renderer));
+    camera.fov = 5;
 }
 
 $(() => {
     THREE.Object3D.DEFAULT_UP = new THREE.Vector3(0, 0, 1);
 
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const container = $("#renderer-container");
+    const width = container.innerWidth();
+    const height = container.innerHeight();
 
     const camera2d = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0, 1);
-    const camera3d = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
+    const camera3d = new THREE.PerspectiveCamera(20, width / height, 0.1, 1000);
 
     const cameraRotation = {Pitch: 0, Yaw: 0, Roll: 0};
     updateCamera(camera3d, cameraRotation);
@@ -357,7 +362,8 @@ $(() => {
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(width, height);
     renderer.setClearAlpha(0.0);
-    document.body.appendChild(renderer.domElement);
+    renderer.clear();
+    renderer.setAnimationLoop(() => scene.draw(renderer));
+    container.append(renderer.domElement);
 
-    renderLoop(scene, renderer);
 });
