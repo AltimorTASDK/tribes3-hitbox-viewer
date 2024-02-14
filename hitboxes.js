@@ -14,9 +14,9 @@ function hamiltonProduct(a, b)
     };
 }
 
-function quaternionInverse(quat)
+function quaternionInverse(quaternion)
 {
-    return {X: -quat.X, Y: -quat.Y, Z: -quat.Z, W: quat.W};
+    return {X: -quaternion.X, Y: -quaternion.Y, Z: -quaternion.Z, W: quaternion.W};
 }
 
 function rotateVectorByQuaternion(vector, rotation)
@@ -32,7 +32,7 @@ function vectorAdd(a, b)
     return {X: a.X + b.X, Y: a.Y + b.Y, Z: a.Z + b.Z};
 }
 
-function rotatorToQuat(rotator)
+function rotatorToQuaternion(rotator)
 {
     const sp = Math.sin(rotator.Pitch * Math.PI / 360);
     const cp = Math.cos(rotator.Pitch * Math.PI / 360);
@@ -254,7 +254,7 @@ class HitboxScene extends RenderTargetScene {
         const bone = this.#bones[hitbox.BoneName];
 
         hitbox.AggGeom.SphylElems?.filter(this.#filter)?.forEach(elem => {
-            const rotation = rotatorToQuat(elem.Rotation);
+            const rotation = rotatorToQuaternion(elem.Rotation);
             const offset1 = rotateVectorByQuaternion({X: 0, Y: 0, Z:  elem.Length / 2}, rotation);
             const offset2 = rotateVectorByQuaternion({X: 0, Y: 0, Z: -elem.Length / 2}, rotation);
             const position1 = boneTransform(bone, vectorAdd(offset1, elem.Center));
@@ -313,7 +313,7 @@ class HitboxScene extends RenderTargetScene {
 
 function updateCamera(camera, cameraRotation)
 {
-    const quaternion = rotatorToQuat(cameraRotation);
+    const quaternion = rotatorToQuaternion(cameraRotation);
     camera.quaternion.set(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
     camera.quaternion.multiply(new THREE.Quaternion(0.5, 0.5, 0.5, 0.5));
     camera.position.set(0, 0, 200);
@@ -336,11 +336,11 @@ $(() => {
     const camera2d = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0, 1);
     const camera3d = new THREE.PerspectiveCamera(74, width / height, 0.1, 1000);
 
-    let cameraRotation = {Pitch: 0, Yaw: 0, Roll: 0};
+    const cameraRotation = {Pitch: 0, Yaw: 0, Roll: 0};
     updateCamera(camera3d, cameraRotation);
 
     $(document).on("mousemove", ({originalEvent: event}) => {
-        if (camera3d == null || !(event.buttons & 1))
+        if (!(event.buttons & 1))
             return;
 
         const ROTATION_SENSITIVITY = 0.3;
