@@ -4,28 +4,6 @@ import 'jcanvas';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const ROTATION_SENSITIVITY = 0.3;
-
-let renderer = null;
-let camera = null;
-let camera2d = null;
-let bones = {};
-let hitboxes = [];
-
-let heroScene = null;
-let hitboxScene = null;
-let screenScene = null;
-
-let heroRt = null;
-let hitboxRt = null;
-
-let cylinderGeom = null;
-let halfSphereGeom = null;
-let sphereGeom = null;
-let boxGeom = null;
-
-let cameraRotation = {Pitch: 0, Yaw: 0, Roll: 0};
-
 function hamiltonProduct(a, b)
 {
     return {
@@ -77,90 +55,6 @@ function boneTransform(bone, point)
     return {X: world.x, Y: world.y, Z: world.z};
 }
 
-function createSphyl(scene, material, start, end, radius)
-{
-    const direction = new THREE.Vector3(end.X - start.X, end.Y - start.Y, end.Z - start.Z);
-    const length = direction.length();
-    direction.normalize();
-
-    const cylinder = new THREE.Mesh(cylinderGeom, material);
-    cylinder.scale.set(radius, length, radius);
-    cylinder.lookAt(direction);
-    cylinder.rotateX(Math.PI / 2);
-    cylinder.position.set(start.X, start.Y, start.Z);
-    cylinder.position.lerp(new THREE.Vector3(end.X, end.Y, end.Z), 0.5);
-    scene.add(cylinder);
-
-    const startCap = new THREE.Mesh(halfSphereGeom, material);
-    startCap.scale.set(radius, radius, radius);
-    startCap.lookAt(direction);
-    startCap.position.set(start.X, start.Y, start.Z);
-    scene.add(startCap);
-
-    const endCap = new THREE.Mesh(halfSphereGeom, material);
-    endCap.scale.set(radius, radius, radius);
-    endCap.lookAt(direction);
-    endCap.rotateX(Math.PI);
-    endCap.position.set(end.X, end.Y, end.Z);
-    scene.add(endCap);
-}
-
-function createHitbox(scene, material, hitbox)
-{
-    const bone = bones[hitbox.BoneName];
-
-    hitbox.AggGeom.SphylElems?.forEach(elem => {
-        const rotation = rotatorToQuat(elem.Rotation);
-        const offset1 = rotateVectorByQuaternion({X: 0, Y: 0, Z:  elem.Length / 2}, rotation);
-        const offset2 = rotateVectorByQuaternion({X: 0, Y: 0, Z: -elem.Length / 2}, rotation);
-        const position1 = boneTransform(bone, vectorAdd(offset1, elem.Center));
-        const position2 = boneTransform(bone, vectorAdd(offset2, elem.Center));
-        createSphyl(scene, material, position1, position2, elem.Radius);
-    });
-
-    hitbox.AggGeom.SphereElems?.forEach(elem => {
-        const center = boneTransform(bone, elem.Center);
-        const sphere = new THREE.Mesh(sphereGeom, material);
-        sphere.scale.set(elem.Radius, elem.Radius, elem.Radius);
-        sphere.position.set(center.X, center.Y, center.Z);
-        scene.add(sphere);
-    });
-
-    hitbox.AggGeom.BoxElems?.forEach(elem => {
-        const center = boneTransform(bone, elem.Center);
-        const box = new THREE.Mesh(boxGeom, material);
-        box.scale.set(elem.X, elem.Y, elem.Z);
-        bone.getWorldQuaternion(box.quaternion);
-        box.rotateX(elem.Rotation.Pitch *  Math.PI / 180 + Math.PI / 2);
-        box.rotateY(elem.Rotation.Yaw   *  Math.PI / 180);
-        box.rotateZ(elem.Rotation.Roll  * -Math.PI / 180);
-        box.position.set(center.X, center.Y, center.Z);
-        scene.add(box);
-    });
-}
-
-function updateBones(object)
-{
-    if (object.type == "Bone")
-        bones[object.name] = object;
-
-    object.children.forEach(updateBones);
-}
-
-function renderLoop()
-{
-    renderer.setRenderTarget(heroRt);
-    renderer.render(heroScene, camera);
-
-    renderer.setRenderTarget(hitboxRt);
-    renderer.render(hitboxScene, camera);
-
-    renderer.setRenderTarget(null);
-    renderer.render(screenScene, camera2d);
-
-    requestAnimationFrame(renderLoop);
-}
-
 function addLights(scene)
 {
     scene.add(new THREE.AmbientLight(0x404040));
@@ -174,44 +68,235 @@ function addLights(scene)
     scene.add(light2);
 }
 
-function createHeroScene(heroModel)
-{
-    const scene = new THREE.Scene();
-    addLights(scene);
-    scene.add(heroModel);
-    return scene;
+class Scene {
+    constructor(camera)
+    {
+        this.camera = camera;
+        this.scene = this.createScene();
+    }
+
+    draw(renderer)
+    {
+        renderer.setRenderTarget(null);
+        renderer.render(this.scene, this.camera);
+    }
+
+    createScene()
+    {
+        return null;
+    }
 }
 
-function createHitboxScene()
-{
-    const scene = new THREE.Scene();
-    addLights(scene);
-    const material = new THREE.MeshStandardMaterial({color: 0x007FFF});
-    hitboxes.forEach(hitbox => createHitbox(scene, material, hitbox));
-    return scene;
+class CompositeScene extends Scene {
+    static #fullscreenQuad = new THREE.PlaneGeometry(1, 1);
+
+    #scenes;
+
+    #updateBones(object, bones)
+    {
+        if (object.type === "Bone")
+            bones[object.name] = object;
+
+        object.children.forEach(child => this.#updateBones(child, bones));
+    }
+
+    #addScenes(camera2d, camera3d, width, height, bones, hitboxes)
+    {
+        this.#scenes.push(
+            new CharacterScene(camera3d, width, height),
+            new HitboxScene(camera3d, hitboxes, 0xFF7F00, elem => elem.Name === "hit_component"),
+            new HitboxScene(camera3d, hitboxes, 0x007FFF, elem => elem.Name !== "hit_component"));
+
+        for (const {renderTargetMaterial} of this.#scenes)
+            this.scene.add(new THREE.Mesh(CompositeScene.#fullscreenQuad, renderTargetMaterial));
+    }
+
+    constructor(camera2d, camera3d, width, height)
+    {
+        this.#scenes = [];
+
+        const gltfPromise = new Promise((resolve, reject) =>
+            new GLTFLoader().load("/models/MESH_PC_BloodEagleLight_A.glb",
+                gltf => resolve(gltf),
+                undefined,
+                error => console.error(error)));
+
+        const jsonPromise = new Promise((resolve, reject) =>
+            $.getJSON("/json/SK_Mannequin_PhysicsAsset_Light.json",
+                json => resolve(json)));
+
+        Promise.all([gltfPromise, jsonPromise]).then((gltf, json) => {
+            const bones = [];
+            this.#updateBones(gltf.scene, bones);
+
+            const physicsAsset = json.find(object => object.Type === "PhysicsAsset");
+            const hitboxes = physicsAsset.Properties.SkeletalBodySetups.map(object => {
+                const index = object.ObjectPath.match(/\.(\d+)$/)[1];
+                return data[index].Properties;
+            });
+
+            this.#addScenes(camera2d, camera3d, width, height, bones, hitboxes);
+        });
+
+        super(camera2d);
+    }
+
+    draw(renderer)
+    {
+        this.#scenes.forEach(scene => scene.draw(renderer));
+        super(renderer);
+    }
+
+    createScene()
+    {
+        return new THREE.Scene();
+    }
 }
 
-function createScreenScene()
-{
-    const scene = new THREE.Scene();
-    const geometry = new THREE.PlaneGeometry(100, 100);
+class RenderTargetScene extends Scene {
+    constructor(camera, width, height)
+    {
+        super(camera);
+        this.renderTarget = this.createRenderTarget(width, height);
+        this.renderTargetMaterial = this.createRenderTargetMaterial();
+    }
 
-    // character
-    scene.add(new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
-        map: heroRt.texture,
-    })));
+    draw(renderer)
+    {
+        renderer.setRenderTarget(this.renderTarget);
+        renderer.render(this.scene, this.camera);
+    }
 
-    // hitboxes
-    scene.add(new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
-        map: hitboxRt.texture,
-        opacity: 0.5,
-        transparent: true,
-    })));
+    createRenderTarget(width, height)
+    {
+        return new THREE.WebGLRenderTarget(width, height, {type: THREE.FloatType});
+    }
 
-    return scene;
+    createRenderTargetMaterial()
+    {
+        return new THREE.MeshBasicMaterial({map: this.renderTarget.texture});
+    }
 }
 
-function updateCamera()
+class CharacterScene extends RenderTargetScene {
+    #gltf;
+
+    constructor(camera, width, height, gltf)
+    {
+        super(camera, width, height);
+        this.#gltf = gltf;
+    }
+
+    createScene()
+    {
+        this.#gltf.scene.rotation.x = Math.PI / 2;
+        this.#gltf.scene.rotation.y = Math.PI / 2;
+        this.#gltf.scene.updateWorldMatrix(true, true);
+
+        const scene = new THREE.Scene();
+        addLights(scene);
+        scene.add(this.#gltf.scene);
+        return scene;
+    }
+}
+
+class HitboxScene extends RenderTargetScene {
+    static #cylinderGeometry   = new THREE.CylinderGeometry(1, 1, 1, 32, 1);
+    static #halfSphereGeometry = new THREE.SphereGeometry(1, 16, 16, Math.PI, Math.PI);
+    static #sphereGeometry     = new THREE.SphereGeometry(1, 16, 16);
+    static #boxGeometry        = new THREE.BoxGeometry(1, 1, 1);
+
+    #createSphyl(scene, material, start, end, radius)
+    {
+        const direction = new THREE.Vector3(end.X - start.X, end.Y - start.Y, end.Z - start.Z);
+        const length = direction.length();
+        direction.normalize();
+
+        const cylinder = new THREE.Mesh(HitboxScene.#cylinderGeometry, material);
+        cylinder.scale.set(radius, length, radius);
+        cylinder.lookAt(direction);
+        cylinder.rotateX(Math.PI / 2);
+        cylinder.position.set(start.X, start.Y, start.Z);
+        cylinder.position.lerp(new THREE.Vector3(end.X, end.Y, end.Z), 0.5);
+        scene.add(cylinder);
+
+        const startCap = new THREE.Mesh(HitboxScene.#halfSphereGeometry, material);
+        startCap.scale.set(radius, radius, radius);
+        startCap.lookAt(direction);
+        startCap.position.set(start.X, start.Y, start.Z);
+        scene.add(startCap);
+
+        const endCap = new THREE.Mesh(HitboxScene.#halfSphereGeometry, material);
+        endCap.scale.set(radius, radius, radius);
+        endCap.lookAt(direction);
+        endCap.rotateX(Math.PI);
+        endCap.position.set(end.X, end.Y, end.Z);
+        scene.add(endCap);
+    }
+
+    #createHitbox(scene, material, hitbox)
+    {
+        const bone = this.bones[hitbox.BoneName];
+
+        hitbox.AggGeom.SphylElems?.filter(this.filter)?.forEach(elem => {
+            const rotation = rotatorToQuat(elem.Rotation);
+            const offset1 = rotateVectorByQuaternion({X: 0, Y: 0, Z:  elem.Length / 2}, rotation);
+            const offset2 = rotateVectorByQuaternion({X: 0, Y: 0, Z: -elem.Length / 2}, rotation);
+            const position1 = boneTransform(bone, vectorAdd(offset1, elem.Center));
+            const position2 = boneTransform(bone, vectorAdd(offset2, elem.Center));
+            this.#createSphyl(scene, material, position1, position2, elem.Radius);
+        });
+
+        hitbox.AggGeom.SphereElems?.filter(this.filter)?.forEach(elem => {
+            const center = boneTransform(bone, elem.Center);
+            const sphere = new THREE.Mesh(HitboxScene.#sphereGeometry, material);
+            sphere.scale.set(elem.Radius, elem.Radius, elem.Radius);
+            sphere.position.set(center.X, center.Y, center.Z);
+            scene.add(sphere);
+        });
+
+        hitbox.AggGeom.BoxElems?.filter(this.filter)?.forEach(elem => {
+            const center = boneTransform(bone, elem.Center);
+            const box = new THREE.Mesh(HitboxScene.#boxGeometry, material);
+            box.scale.set(elem.X, elem.Y, elem.Z);
+            bone.getWorldQuaternion(box.quaternion);
+            box.rotateX(elem.Rotation.Pitch *  Math.PI / 180 + Math.PI / 2);
+            box.rotateY(elem.Rotation.Yaw   *  Math.PI / 180);
+            box.rotateZ(elem.Rotation.Roll  * -Math.PI / 180);
+            box.position.set(center.X, center.Y, center.Z);
+            scene.add(box);
+        });
+    }
+
+    constructor(camera, hitboxes, bones, color, filter)
+    {
+        super(camera);
+        this.hitboxes = hitboxes;
+        this.bones = bones;
+        this.color = color;
+        this.filter = filter;
+    }
+
+    createScene()
+    {
+        const scene = new THREE.Scene();
+        addLights(scene);
+        const material = new THREE.MeshStandardMaterial({color: this.color});
+        this.hitboxes.forEach(hitbox => this.#createHitbox(scene, material, hitbox));
+        return scene;
+    }
+
+    createRenderTargetMaterial()
+    {
+        return new THREE.MeshBasicMaterial({
+            map: this.renderTarget.texture,
+            opacity: 0.5,
+            transparent: true,
+        });
+    }
+}
+
+function updateCamera(camera, cameraRotation)
 {
     const quat = rotatorToQuat(cameraRotation);
     camera.quaternion.set(quat.X, quat.Y, quat.Z, quat.W);
@@ -221,63 +306,41 @@ function updateCamera()
     camera.position.z += 100;
 }
 
-function renderInit(heroModel)
+function renderLoop(scene, renderer)
 {
+    scene.draw(renderer);
+    requestAnimationFrame(() => renderLoop(scene, renderer));
+}
+
+$(() => {
+    THREE.Object3D.DEFAULT_UP = new THREE.Vector3(0, 0, 1);
+
     const width = window.innerWidth;
     const height = window.innerHeight;
 
-    camera = new THREE.PerspectiveCamera(74, width / height, 0.1, 1000);
-    updateCamera();
+    const camera2d = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0, 1);
+    const camera3d = new THREE.PerspectiveCamera(74, width / height, 0.1, 1000);
 
-    camera2d = new THREE.OrthographicCamera(-50, 50, 50, -50, 0, 1);
+    let cameraRotation = {Pitch: 0, Yaw: 0, Roll: 0};
+    updateCamera(camera3d, cameraRotation);
 
-    renderer = new THREE.WebGLRenderer();
+    $(document).on("mousemove", event => {
+        if (camera3d == null || !(event.buttons & 1))
+            return;
+
+        const ROTATION_SENSITIVITY = 0.3;
+
+        cameraRotation.Yaw   -= event.movementX * ROTATION_SENSITIVITY;
+        cameraRotation.Pitch += event.movementY * ROTATION_SENSITIVITY;
+        updateCamera(camera3d, cameraRotation);
+    });
+
+    const scene = new CompositeScene(camera2d, camera3d, width, height);
+
+    const renderer = new THREE.WebGLRenderer();
     renderer.setSize(width, height);
     renderer.setClearAlpha(0.0);
     document.body.appendChild(renderer.domElement);
 
-    cylinderGeom   = new THREE.CylinderGeometry(1, 1, 1, 32, 1);
-    halfSphereGeom = new THREE.SphereGeometry(1, 16, 16, Math.PI, Math.PI);
-    sphereGeom     = new THREE.SphereGeometry(1, 16, 16);
-    boxGeom        = new THREE.BoxGeometry(1, 1, 1);
-
-    heroRt   = new THREE.WebGLRenderTarget(width, height, {type: THREE.FloatType});
-    hitboxRt = new THREE.WebGLRenderTarget(width, height, {type: THREE.FloatType});
-
-    heroScene   = createHeroScene(heroModel);
-    hitboxScene = createHitboxScene();
-    screenScene = createScreenScene();
-}
-
-document.onmousemove = function(event)
-{
-    if (camera == null || !(event.buttons & 1))
-        return;
-
-    cameraRotation.Yaw   -= event.movementX * ROTATION_SENSITIVITY;
-    cameraRotation.Pitch += event.movementY * ROTATION_SENSITIVITY;
-    updateCamera();
-};
-
-$(function()
-{
-    new GLTFLoader().load("/models/MESH_PC_BloodEagleLight_A.glb",
-        gltf => {
-            gltf.scene.rotation.x = Math.PI / 2;
-            gltf.scene.rotation.y = Math.PI / 2;
-            gltf.scene.updateWorldMatrix(true, true);
-            updateBones(gltf.scene);
-
-            $.getJSON("/json/SK_Mannequin_PhysicsAsset_Light.json", data => {
-                hitboxes = data[0].Properties.SkeletalBodySetups.map(object => {
-                    const split = object.ObjectPath.split('.');
-                    const index = split[split.length - 1];
-                    return data[index].Properties;
-                });
-                renderInit(gltf.scene);
-                renderLoop();
-            });
-        },
-        undefined,
-        error => console.error(error));
+    renderLoop(scene, renderer);
 });
