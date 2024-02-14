@@ -51,7 +51,7 @@ function rotatorToQuaternion(rotator)
 
 function boneTransform(bone, point)
 {
-    const world = bone.localToWorld(new THREE.Vector3(point.X, point.Z, point.Y));
+    const world = bone.localToWorld(new THREE.Vector3(point.X, point.Y, point.Z));
     return {X: world.x, Y: world.y, Z: world.z};
 }
 
@@ -115,8 +115,10 @@ class CompositeScene extends Scene {
     {
         this.#scenes.push(
             new CharacterScene(camera3d, width, height, gltf),
-            new HitboxScene(camera3d, hitboxes, bones, 0xFF7F00, e => e.Name === "hit_component"),
-            new HitboxScene(camera3d, hitboxes, bones, 0x007FFF, e => e.Name !== "hit_component"));
+            new HitboxScene(camera3d, width, height, hitboxes, bones,
+                            0xFF7F00, e => e.Name === "hit_component"),
+            new HitboxScene(camera3d, width, height, hitboxes, bones,
+                            0x007FFF, e => e.Name !== "hit_component"));
 
         for (const {renderTargetMaterial} of this.#scenes)
             this.scene.add(new THREE.Mesh(CompositeScene.#fullscreenQuad, renderTargetMaterial));
@@ -283,9 +285,9 @@ class HitboxScene extends RenderTargetScene {
         });
     }
 
-    constructor(camera, hitboxes, bones, color, filter)
+    constructor(camera, width, height, hitboxes, bones, color, filter)
     {
-        super(camera);
+        super(camera, width, height);
         this.#hitboxes = hitboxes;
         this.#bones = bones;
         this.#color = color;
@@ -316,7 +318,7 @@ function updateCamera(camera, cameraRotation)
     const quaternion = rotatorToQuaternion(cameraRotation);
     camera.quaternion.set(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
     camera.quaternion.multiply(new THREE.Quaternion(0.5, 0.5, 0.5, 0.5));
-    camera.position.set(0, 0, 200);
+    camera.position.set(0, 0, 400);
     camera.position.applyQuaternion(camera.quaternion);
     camera.position.z += 100;
 }
@@ -334,7 +336,7 @@ $(() => {
     const height = window.innerHeight;
 
     const camera2d = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0, 1);
-    const camera3d = new THREE.PerspectiveCamera(74, width / height, 0.1, 1000);
+    const camera3d = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
 
     const cameraRotation = {Pitch: 0, Yaw: 0, Roll: 0};
     updateCamera(camera3d, cameraRotation);
