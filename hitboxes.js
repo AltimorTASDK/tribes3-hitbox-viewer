@@ -313,8 +313,8 @@ class HitboxScene extends RenderTargetScene {
 
 function updateCamera(camera, cameraRotation)
 {
-    const quat = rotatorToQuat(cameraRotation);
-    camera.quaternion.set(quat.X, quat.Y, quat.Z, quat.W);
+    const quaternion = rotatorToQuat(cameraRotation);
+    camera.quaternion.set(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
     camera.quaternion.multiply(new THREE.Quaternion(0.5, 0.5, 0.5, 0.5));
     camera.position.set(0, 0, 200);
     camera.position.applyQuaternion(camera.quaternion);
