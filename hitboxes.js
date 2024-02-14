@@ -69,10 +69,21 @@ function addLights(scene)
 }
 
 class Scene {
+    #scene;
+
     constructor(camera)
     {
         this.camera = camera;
-        this.scene = this.createScene();
+        this.#scene = undefined;
+    }
+
+    get scene()
+    {
+        // Lazy create after constructor runs
+        if (this.#scene === undefined)
+            this.#scene = this.createScene();
+
+        return this.#scene;
     }
 
     draw(renderer)
@@ -100,12 +111,12 @@ class CompositeScene extends Scene {
         object.children.forEach(child => this.#updateBones(child, bones));
     }
 
-    #addScenes(camera2d, camera3d, width, height, bones, hitboxes)
+    #addScenes(camera3d, width, height, gltf, bones, hitboxes)
     {
         this.#scenes.push(
-            new CharacterScene(camera3d, width, height),
-            new HitboxScene(camera3d, hitboxes, 0xFF7F00, elem => elem.Name === "hit_component"),
-            new HitboxScene(camera3d, hitboxes, 0x007FFF, elem => elem.Name !== "hit_component"));
+            new CharacterScene(camera3d, width, height, gltf),
+            new HitboxScene(camera3d, hitboxes, bones, 0xFF7F00, e => e.Name === "hit_component"),
+            new HitboxScene(camera3d, hitboxes, bones, 0x007FFF, e => e.Name !== "hit_component"));
 
         for (const {renderTargetMaterial} of this.#scenes)
             this.scene.add(new THREE.Mesh(CompositeScene.#fullscreenQuad, renderTargetMaterial));
@@ -113,6 +124,8 @@ class CompositeScene extends Scene {
 
     constructor(camera2d, camera3d, width, height)
     {
+        super(camera2d);
+
         this.#scenes = [];
 
         const gltfPromise = new Promise((resolve, reject) =>
@@ -125,26 +138,24 @@ class CompositeScene extends Scene {
             $.getJSON("/json/SK_Mannequin_PhysicsAsset_Light.json",
                 json => resolve(json)));
 
-        Promise.all([gltfPromise, jsonPromise]).then((gltf, json) => {
+        Promise.all([gltfPromise, jsonPromise]).then(([gltf, json]) => {
             const bones = [];
             this.#updateBones(gltf.scene, bones);
 
             const physicsAsset = json.find(object => object.Type === "PhysicsAsset");
             const hitboxes = physicsAsset.Properties.SkeletalBodySetups.map(object => {
                 const index = object.ObjectPath.match(/\.(\d+)$/)[1];
-                return data[index].Properties;
+                return json[index].Properties;
             });
 
-            this.#addScenes(camera2d, camera3d, width, height, bones, hitboxes);
+            this.#addScenes(camera3d, width, height, gltf, bones, hitboxes);
         });
-
-        super(camera2d);
     }
 
     draw(renderer)
     {
         this.#scenes.forEach(scene => scene.draw(renderer));
-        super(renderer);
+        super.draw(renderer);
     }
 
     createScene()
@@ -189,12 +200,11 @@ class CharacterScene extends RenderTargetScene {
 
     createScene()
     {
+        const scene = new THREE.Scene();
+        addLights(scene);
         this.#gltf.scene.rotation.x = Math.PI / 2;
         this.#gltf.scene.rotation.y = Math.PI / 2;
         this.#gltf.scene.updateWorldMatrix(true, true);
-
-        const scene = new THREE.Scene();
-        addLights(scene);
         scene.add(this.#gltf.scene);
         return scene;
     }
@@ -205,6 +215,11 @@ class HitboxScene extends RenderTargetScene {
     static #halfSphereGeometry = new THREE.SphereGeometry(1, 16, 16, Math.PI, Math.PI);
     static #sphereGeometry     = new THREE.SphereGeometry(1, 16, 16);
     static #boxGeometry        = new THREE.BoxGeometry(1, 1, 1);
+
+    #hitboxes;
+    #bones;
+    #color;
+    #filter;
 
     #createSphyl(scene, material, start, end, radius)
     {
@@ -236,9 +251,9 @@ class HitboxScene extends RenderTargetScene {
 
     #createHitbox(scene, material, hitbox)
     {
-        const bone = this.bones[hitbox.BoneName];
+        const bone = this.#bones[hitbox.BoneName];
 
-        hitbox.AggGeom.SphylElems?.filter(this.filter)?.forEach(elem => {
+        hitbox.AggGeom.SphylElems?.filter(this.#filter)?.forEach(elem => {
             const rotation = rotatorToQuat(elem.Rotation);
             const offset1 = rotateVectorByQuaternion({X: 0, Y: 0, Z:  elem.Length / 2}, rotation);
             const offset2 = rotateVectorByQuaternion({X: 0, Y: 0, Z: -elem.Length / 2}, rotation);
@@ -247,7 +262,7 @@ class HitboxScene extends RenderTargetScene {
             this.#createSphyl(scene, material, position1, position2, elem.Radius);
         });
 
-        hitbox.AggGeom.SphereElems?.filter(this.filter)?.forEach(elem => {
+        hitbox.AggGeom.SphereElems?.filter(this.#filter)?.forEach(elem => {
             const center = boneTransform(bone, elem.Center);
             const sphere = new THREE.Mesh(HitboxScene.#sphereGeometry, material);
             sphere.scale.set(elem.Radius, elem.Radius, elem.Radius);
@@ -255,7 +270,7 @@ class HitboxScene extends RenderTargetScene {
             scene.add(sphere);
         });
 
-        hitbox.AggGeom.BoxElems?.filter(this.filter)?.forEach(elem => {
+        hitbox.AggGeom.BoxElems?.filter(this.#filter)?.forEach(elem => {
             const center = boneTransform(bone, elem.Center);
             const box = new THREE.Mesh(HitboxScene.#boxGeometry, material);
             box.scale.set(elem.X, elem.Y, elem.Z);
@@ -271,18 +286,18 @@ class HitboxScene extends RenderTargetScene {
     constructor(camera, hitboxes, bones, color, filter)
     {
         super(camera);
-        this.hitboxes = hitboxes;
-        this.bones = bones;
-        this.color = color;
-        this.filter = filter;
+        this.#hitboxes = hitboxes;
+        this.#bones = bones;
+        this.#color = color;
+        this.#filter = filter;
     }
 
     createScene()
     {
         const scene = new THREE.Scene();
         addLights(scene);
-        const material = new THREE.MeshStandardMaterial({color: this.color});
-        this.hitboxes.forEach(hitbox => this.#createHitbox(scene, material, hitbox));
+        const material = new THREE.MeshStandardMaterial({color: this.#color});
+        this.#hitboxes.forEach(hitbox => this.#createHitbox(scene, material, hitbox));
         return scene;
     }
 
