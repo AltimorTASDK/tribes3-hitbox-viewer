@@ -339,7 +339,7 @@ $(() => {
     let cameraRotation = {Pitch: 0, Yaw: 0, Roll: 0};
     updateCamera(camera3d, cameraRotation);
 
-    $(document).on("mousemove", event => {
+    $(document).on("mousemove", ({originalEvent: event}) => {
         if (camera3d == null || !(event.buttons & 1))
             return;
 
