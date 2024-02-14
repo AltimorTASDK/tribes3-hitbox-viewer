@@ -4,9 +4,17 @@ import 'jcanvas';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const ARMOR_SCALE = 0.94;
-const ARMOR_MESH = "/models/MESH_PC_BloodEagleLight_A.glb";
-const ARMOR_JSON = "/json/SK_Mannequin_PhysicsAsset_Light.json";
+//const ARMOR_SCALE = 0.94;
+//const ARMOR_MESH = "/models/MESH_PC_BloodEagleLight_A.glb";
+//const ARMOR_JSON = "/json/SK_Mannequin_PhysicsAsset_Light.json";
+
+//const ARMOR_SCALE = 1.015;
+//const ARMOR_MESH = "/models/MESH_PC_BloodEagleMed.glb";
+//const ARMOR_JSON = "/json/SK_Mannequin_PhysicsAsset_Medium.json";
+
+const ARMOR_SCALE = 1.05;
+const ARMOR_MESH = "/models/MESH_PC_DSwordHeavy.glb";
+const ARMOR_JSON = "/json/SK_Mannequin_PhysicsAsset_Heavy.json";
 
 function hamiltonProduct(a, b)
 {
@@ -64,11 +72,11 @@ function addLights(scene)
     scene.add(new THREE.AmbientLight(0x404040));
 
     const light1 = new THREE.DirectionalLight(0xFFFFFF, 1.0);
-    light1.position.set(200, 0, 100);
+    light1.position.set(0, -200, 100);
     scene.add(light1);
 
     const light2 = new THREE.DirectionalLight(0xFFFFFF, 0.5);
-    light2.position.set(-200, 0, 100);
+    light2.position.set(0, 200, 100);
     scene.add(light2);
 }
 
@@ -110,7 +118,7 @@ class CompositeScene extends Scene {
     #updateBones(object, bones)
     {
         if (object.type === "Bone")
-            bones[object.name] = object;
+            bones[object.name.toLowerCase()] = object;
 
         object.children.forEach(child => this.#updateBones(child, bones));
     }
@@ -135,10 +143,7 @@ class CompositeScene extends Scene {
         this.#scenes = [];
 
         const gltfPromise = new Promise((resolve, reject) =>
-            new GLTFLoader().load(ARMOR_MESH,
-                gltf => resolve(gltf),
-                undefined,
-                error => console.error(error)));
+            new GLTFLoader().load(ARMOR_MESH, resolve, undefined, console.error));
 
         const jsonPromise = new Promise((resolve, reject) =>
             $.getJSON(ARMOR_JSON, json => resolve(json)));
@@ -198,22 +203,30 @@ class RenderTargetScene extends Scene {
 }
 
 class CharacterScene extends RenderTargetScene {
+    #clock;
     #gltf;
+    #mixer;
 
     constructor(camera, width, height, gltf)
     {
         super(camera, width, height);
         this.#gltf = gltf;
+        this.#gltf.scene.scale.setScalar(ARMOR_SCALE);
+        this.#clock = new THREE.Clock();
+        this.#mixer = new THREE.AnimationMixer(this.#gltf.scene);
+        this.#mixer.clipAction(this.#gltf.animations[0]).play();
+    }
+
+    draw(renderer)
+    {
+        this.#mixer.update(this.#clock.getDelta());
+        super.draw(renderer);
     }
 
     createScene()
     {
         const scene = new THREE.Scene();
         addLights(scene);
-        this.#gltf.scene.rotation.x = Math.PI / 2;
-        this.#gltf.scene.rotation.y = Math.PI / 2;
-        this.#gltf.scene.updateWorldMatrix(true, true);
-        this.#gltf.scene.scale.setScalar(ARMOR_SCALE);
         scene.add(this.#gltf.scene);
         return scene;
     }
@@ -260,7 +273,7 @@ class HitboxScene extends RenderTargetScene {
 
     #createHitbox(scene, material, hitbox)
     {
-        const bone = this.#bones[hitbox.BoneName];
+        const bone = this.#bones[hitbox.BoneName.toLowerCase()];
 
         hitbox.AggGeom.SphylElems?.filter(this.#filter)?.forEach(elem => {
             const rotation = rotatorToQuaternion(elem.Rotation);
@@ -324,13 +337,12 @@ class HitboxScene extends RenderTargetScene {
 
 function updateCamera(camera, cameraRotation)
 {
-    const quaternion = rotatorToQuaternion(cameraRotation);
-    camera.quaternion.set(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
-    camera.quaternion.multiply(new THREE.Quaternion(0.5, 0.5, 0.5, 0.5));
-    camera.position.set(0, 0, 700);
-    camera.position.applyQuaternion(camera.quaternion);
+    const quat = rotatorToQuaternion(cameraRotation);
+    camera.position.set(700, 0, 0);
+    camera.position.applyQuaternion(new THREE.Quaternion(quat.X, quat.Y, quat.Z, quat.W));
+    camera.position.applyEuler(new THREE.Euler(0, 0, -Math.PI / 2));
     camera.position.z += 100;
-    camera.fov = 5;
+    camera.lookAt(0, 0, 100);
 }
 
 $(() => {
