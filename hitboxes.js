@@ -4,17 +4,26 @@ import 'jcanvas';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-//const ARMOR_SCALE = 0.94;
-//const ARMOR_MESH = "/models/MESH_PC_BloodEagleLight_A.glb";
-//const ARMOR_JSON = "/json/SK_Mannequin_PhysicsAsset_Light.json";
-
-//const ARMOR_SCALE = 1.015;
-//const ARMOR_MESH = "/models/MESH_PC_BloodEagleMed.glb";
-//const ARMOR_JSON = "/json/SK_Mannequin_PhysicsAsset_Medium.json";
-
-const ARMOR_SCALE = 1.05;
-const ARMOR_MESH = "/models/MESH_PC_DSwordHeavy.glb";
-const ARMOR_JSON = "/json/SK_Mannequin_PhysicsAsset_Heavy.json";
+const ARMORS = [
+    {
+        name: "Light",
+        scale: 0.94,
+        mesh: "/models/MESH_PC_BloodEagleLight_A.glb",
+        json: "/json/SK_Mannequin_PhysicsAsset_Light.json"
+    },
+    {
+        name: "Medium",
+        scale: 1.015,
+        mesh: "/models/MESH_PC_BloodEagleMed.glb",
+        json: "/json/SK_Mannequin_PhysicsAsset_Medium.json"
+    },
+    {
+        name: "Heavy",
+        scale: 1.05,
+        mesh: "/models/MESH_PC_DSwordHeavy.glb",
+        json: "/json/SK_Mannequin_PhysicsAsset_Heavy.json"
+    }
+];
 
 function hamiltonProduct(a, b)
 {
@@ -69,7 +78,7 @@ function boneTransform(bone, point)
 
 function addLights(scene)
 {
-    scene.add(new THREE.AmbientLight(0x404040));
+    scene.add(new THREE.AmbientLight(0xFFFFFF, 0.25));
 
     const light1 = new THREE.DirectionalLight(0xFFFFFF, 1.0);
     light1.position.set(0, -200, 100);
@@ -80,13 +89,75 @@ function addLights(scene)
     scene.add(light2);
 }
 
+function getArmor()
+{
+    return ARMORS[0];
+}
+
+class ArmorOption extends HTMLElement {
+    static observedAttributes = ["index"];
+
+    #index;
+
+    #shadow = this.attachShadow({mode: "closed"});
+    #text = document.createElement("div");
+
+    constructor()
+    {
+        super();
+
+        this.#shadow.appendChild(this.#text);
+
+        this.addEventListener("click", event => {
+            this.dispatchEvent(new CustomEvent("armor-selected", {
+                bubbles: true,
+                composed: true,
+                detail: {index: this.#index}
+            }));
+        });
+    }
+
+    #setIndex(index)
+    {
+        this.#index = index;
+        this.#text.textContent = ARMORS[index]?.name;
+    }
+
+    attributeChangedCallback(name, oldValue, newValue)
+    {
+        switch (name) {
+            case "index":
+                this.#setIndex(newValue);
+                break;
+        }
+    }
+}
+
+customElements.define("armor-option", ArmorOption);
+
+class ArmorSelector extends HTMLElement {
+    #shadow = this.attachShadow({mode: "closed"});
+
+    constructor()
+    {
+        super();
+
+        for (let i = 0; i < ARMORS.length; i++) {
+            const option = new ArmorOption();
+            option.setAttribute("index", i);
+            this.#shadow.appendChild(option);
+        }
+    }
+}
+
+customElements.define("armor-selector", ArmorSelector);
+
 class Scene {
     #scene;
 
     constructor(camera)
     {
         this.camera = camera;
-        this.#scene = undefined;
     }
 
     get scene()
@@ -117,10 +188,14 @@ class CompositeScene extends Scene {
 
     #updateBones(object, bones)
     {
+        if (bones === undefined)
+            bones = [];
+
         if (object.type === "Bone")
             bones[object.name.toLowerCase()] = object;
 
         object.children.forEach(child => this.#updateBones(child, bones));
+        return bones;
     }
 
     #addScenes(camera3d, width, height, gltf, bones, hitboxes)
@@ -142,21 +217,24 @@ class CompositeScene extends Scene {
 
         this.#scenes = [];
 
+        const armor = getArmor();
+
         const gltfPromise = new Promise((resolve, reject) =>
-            new GLTFLoader().load(ARMOR_MESH, resolve, undefined, console.error));
+            new GLTFLoader().load(armor.mesh, resolve, undefined, console.error));
 
         const jsonPromise = new Promise((resolve, reject) =>
-            $.getJSON(ARMOR_JSON, json => resolve(json)));
+            $.getJSON(armor.json, json => resolve(json)));
 
         Promise.all([gltfPromise, jsonPromise]).then(([gltf, json]) => {
-            const bones = [];
-            this.#updateBones(gltf.scene, bones);
+            const bones = this.#updateBones(gltf.scene);
 
             const physicsAsset = json.find(object => object.Type === "PhysicsAsset");
             const hitboxes = physicsAsset.Properties.SkeletalBodySetups.map(object => {
                 const index = object.ObjectPath.match(/\.(\d+)$/)[1];
                 return json[index].Properties;
             });
+
+            gltf.scene.scale.multiplyScalar(armor.scale);
 
             this.#addScenes(camera3d, width, height, gltf, bones, hitboxes);
         });
@@ -211,7 +289,6 @@ class CharacterScene extends RenderTargetScene {
     {
         super(camera, width, height);
         this.#gltf = gltf;
-        this.#gltf.scene.scale.setScalar(ARMOR_SCALE);
         this.#clock = new THREE.Clock();
         this.#mixer = new THREE.AnimationMixer(this.#gltf.scene);
         this.#mixer.clipAction(this.#gltf.animations[0]).play();
@@ -274,6 +351,7 @@ class HitboxScene extends RenderTargetScene {
     #createHitbox(scene, material, hitbox)
     {
         const bone = this.#bones[hitbox.BoneName.toLowerCase()];
+        const scale = getArmor().scale;
 
         hitbox.AggGeom.SphylElems?.filter(this.#filter)?.forEach(elem => {
             const rotation = rotatorToQuaternion(elem.Rotation);
@@ -281,14 +359,14 @@ class HitboxScene extends RenderTargetScene {
             const offset2 = rotateVectorByQuaternion({X: 0, Y: 0, Z: -elem.Length / 2}, rotation);
             const position1 = boneTransform(bone, vectorAdd(offset1, elem.Center));
             const position2 = boneTransform(bone, vectorAdd(offset2, elem.Center));
-            const radius = elem.Radius * ARMOR_SCALE;
+            const radius = elem.Radius * scale;
             this.#createSphyl(scene, material, position1, position2, radius);
         });
 
         hitbox.AggGeom.SphereElems?.filter(this.#filter)?.forEach(elem => {
             const center = boneTransform(bone, elem.Center);
             const sphere = new THREE.Mesh(HitboxScene.#sphereGeometry, material);
-            sphere.scale.setScalar(elem.Radius * ARMOR_SCALE);
+            sphere.scale.setScalar(elem.Radius * scale);
             sphere.position.set(center.X, center.Y, center.Z);
             scene.add(sphere);
         });
@@ -297,7 +375,7 @@ class HitboxScene extends RenderTargetScene {
             const center = boneTransform(bone, elem.Center);
             const box = new THREE.Mesh(HitboxScene.#boxGeometry, material);
             box.scale.set(elem.X, elem.Y, elem.Z);
-            box.scale.multiplyScalar(ARMOR_SCALE);
+            box.scale.multiplyScalar(scale);
             bone.getWorldQuaternion(box.quaternion);
             box.rotateX(elem.Rotation.Pitch *  Math.PI / 180 + Math.PI / 2);
             box.rotateY(elem.Rotation.Yaw   *  Math.PI / 180);
@@ -330,7 +408,7 @@ class HitboxScene extends RenderTargetScene {
         return new THREE.MeshBasicMaterial({
             map: this.renderTarget.texture,
             opacity: 0.5,
-            transparent: true,
+            transparent: true
         });
     }
 }
@@ -366,16 +444,19 @@ $(() => {
 
         cameraRotation.Yaw   -= event.movementX * ROTATION_SENSITIVITY;
         cameraRotation.Pitch += event.movementY * ROTATION_SENSITIVITY;
+        cameraRotation.Pitch = Math.min(Math.max(cameraRotation.Pitch, -89), 89);
         updateCamera(camera3d, cameraRotation);
     });
-
-    const scene = new CompositeScene(camera2d, camera3d, width, height);
 
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(width, height);
     renderer.setClearAlpha(0.0);
     renderer.clear();
-    renderer.setAnimationLoop(() => scene.draw(renderer));
     container.append(renderer.domElement);
 
+    addEventListener("armor-selected", event => {
+        const armor = ARMORS[event.index];
+        const scene = new CompositeScene(camera2d, camera3d, width, height);
+        renderer.setAnimationLoop(() => scene.draw(renderer));
+    });
 });
