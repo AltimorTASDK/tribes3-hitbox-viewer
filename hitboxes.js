@@ -7,19 +7,28 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 const ARMORS = [
     {
         name: "Light",
+        offsetZ: -89.0,
         scale: 0.94,
+        radius: 50,
+        height: 176,
         mesh: "/models/MESH_PC_BloodEagleLight_A.glb",
         json: "/json/SK_Mannequin_PhysicsAsset_Light.json"
     },
     {
         name: "Medium",
+        offsetZ: -90.0,
         scale: 1.015,
+        radius: 50,
+        height: 176,
         mesh: "/models/MESH_PC_BloodEagleMed.glb",
         json: "/json/SK_Mannequin_PhysicsAsset_Medium.json"
     },
     {
         name: "Heavy",
+        offsetZ: -97.0,
         scale: 1.05,
+        radius: 50,
+        height: 196,
         mesh: "/models/MESH_PC_DSwordHeavy.glb",
         json: "/json/SK_Mannequin_PhysicsAsset_Heavy.json"
     }
@@ -78,7 +87,7 @@ function boneTransform(bone, point)
 
 function addLights(scene)
 {
-    scene.add(new THREE.AmbientLight(0xFFFFFF, 0.25));
+    scene.add(new THREE.AmbientLight(0xFFFFFF, 1.0));
 
     const light1 = new THREE.DirectionalLight(0xFFFFFF, 1.0);
     light1.position.set(0, -200, 100);
@@ -87,11 +96,6 @@ function addLights(scene)
     const light2 = new THREE.DirectionalLight(0xFFFFFF, 0.5);
     light2.position.set(0, 200, 100);
     scene.add(light2);
-}
-
-function getArmor()
-{
-    return ARMORS[0];
 }
 
 class ArmorOption extends HTMLElement {
@@ -184,6 +188,7 @@ class Scene {
 class CompositeScene extends Scene {
     static #fullscreenQuad = new THREE.PlaneGeometry(1, 1);
 
+    #armor;
     #scenes;
 
     #updateBones(object, bones)
@@ -202,22 +207,23 @@ class CompositeScene extends Scene {
     {
         this.#scenes.push(
             new CharacterScene(camera3d, width, height, gltf),
-            new HitboxScene(camera3d, width, height, hitboxes, bones,
-                            0xFF7F00, e => e.Name === "hit_component"),
-            new HitboxScene(camera3d, width, height, hitboxes, bones,
-                            0x007FFF, e => e.Name !== "hit_component"));
+            new HitboxScene(this.#armor, camera3d, width, height, hitboxes, bones,
+                            0xFF0000, 0.5, e => e.Name === "hit_component"),
+            new HitboxScene(this.#armor, camera3d, width, height, hitboxes, bones,
+                            0xFF8000, 0.7, e => e.Name !== "hit_component"),
+            new CollisionScene(this.#armor, camera3d, width, height,
+                            0x0000FF, 0.3));
 
         for (const {renderTargetMaterial} of this.#scenes)
             this.scene.add(new THREE.Mesh(CompositeScene.#fullscreenQuad, renderTargetMaterial));
     }
 
-    constructor(camera2d, camera3d, width, height)
+    constructor(armor, camera2d, camera3d, width, height)
     {
         super(camera2d);
 
+        this.#armor = armor;
         this.#scenes = [];
-
-        const armor = getArmor();
 
         const gltfPromise = new Promise((resolve, reject) =>
             new GLTFLoader().load(armor.mesh, resolve, undefined, console.error));
@@ -234,7 +240,8 @@ class CompositeScene extends Scene {
                 return json[index].Properties;
             });
 
-            gltf.scene.scale.multiplyScalar(armor.scale);
+            gltf.scene.position.z = armor.offsetZ;
+            gltf.scene.scale.setScalar(armor.scale);
 
             this.#addScenes(camera3d, width, height, gltf, bones, hitboxes);
         });
@@ -253,11 +260,32 @@ class CompositeScene extends Scene {
 }
 
 class RenderTargetScene extends Scene {
+    #width;
+    #height;
+    #renderTarget;
+    #renderTargetMaterial;
+
     constructor(camera, width, height)
     {
         super(camera);
-        this.renderTarget = this.createRenderTarget(width, height);
-        this.renderTargetMaterial = this.createRenderTargetMaterial();
+        this.#width = width;
+        this.#height = height;
+    }
+
+    get renderTarget()
+    {
+        if (this.#renderTarget === undefined)
+            this.#renderTarget = this.createRenderTarget(this.#width, this.#height);
+
+        return this.#renderTarget;
+    }
+
+    get renderTargetMaterial()
+    {
+        if (this.#renderTargetMaterial === undefined)
+            this.#renderTargetMaterial = this.createRenderTargetMaterial();
+
+        return this.#renderTargetMaterial;
     }
 
     draw(renderer)
@@ -315,9 +343,11 @@ class HitboxScene extends RenderTargetScene {
     static #sphereGeometry     = new THREE.SphereGeometry(1, 16, 16);
     static #boxGeometry        = new THREE.BoxGeometry(1, 1, 1);
 
+    #armor;
     #hitboxes;
     #bones;
     #color;
+    opacity;
     #filter;
 
     #createSphyl(scene, material, start, end, radius)
@@ -351,7 +381,7 @@ class HitboxScene extends RenderTargetScene {
     #createHitbox(scene, material, hitbox)
     {
         const bone = this.#bones[hitbox.BoneName.toLowerCase()];
-        const scale = getArmor().scale;
+        const scale = this.#armor.scale;
 
         hitbox.AggGeom.SphylElems?.filter(this.#filter)?.forEach(elem => {
             const rotation = rotatorToQuaternion(elem.Rotation);
@@ -385,12 +415,14 @@ class HitboxScene extends RenderTargetScene {
         });
     }
 
-    constructor(camera, width, height, hitboxes, bones, color, filter)
+    constructor(armor, camera, width, height, hitboxes, bones, color, opacity, filter)
     {
         super(camera, width, height);
+        this.#armor = armor;
         this.#hitboxes = hitboxes;
         this.#bones = bones;
         this.#color = color;
+        this.opacity = opacity;
         this.#filter = filter;
     }
 
@@ -407,7 +439,79 @@ class HitboxScene extends RenderTargetScene {
     {
         return new THREE.MeshBasicMaterial({
             map: this.renderTarget.texture,
-            opacity: 0.5,
+            opacity: this.opacity,
+            transparent: true
+        });
+    }
+}
+
+class CollisionScene extends RenderTargetScene {
+    static #cylinderGeometry   = new THREE.CylinderGeometry(1, 1, 1, 32, 1);
+    static #halfSphereGeometry = new THREE.SphereGeometry(1, 16, 16, Math.PI, Math.PI);
+
+    #armor;
+    #color;
+    #opacity;
+
+    #createSphyl(scene, material, start, end, radius)
+    {
+        const direction = new THREE.Vector3(end.X - start.X, end.Y - start.Y, end.Z - start.Z);
+        const length = direction.length();
+        direction.normalize();
+
+        const cylinder = new THREE.Mesh(CollisionScene.#cylinderGeometry, material);
+        cylinder.scale.set(radius, length, radius);
+        cylinder.lookAt(direction);
+        cylinder.rotateX(Math.PI / 2);
+        cylinder.position.set(start.X, start.Y, start.Z);
+        cylinder.position.lerp(new THREE.Vector3(end.X, end.Y, end.Z), 0.5);
+        scene.add(cylinder);
+
+        const startCap = new THREE.Mesh(CollisionScene.#halfSphereGeometry, material);
+        startCap.scale.set(radius, radius, radius);
+        startCap.lookAt(direction);
+        startCap.position.set(start.X, start.Y, start.Z);
+        scene.add(startCap);
+
+        const endCap = new THREE.Mesh(CollisionScene.#halfSphereGeometry, material);
+        endCap.scale.set(radius, radius, radius);
+        endCap.lookAt(direction);
+        endCap.rotateX(Math.PI);
+        endCap.position.set(end.X, end.Y, end.Z);
+        scene.add(endCap);
+    }
+
+    #createCollision(scene, material)
+    {
+        const radius = this.#armor.radius;
+        const offset = this.#armor.height / 2 - radius;
+        const position1 = {X: 0, Y: 0, Z:  offset};
+        const position2 = {X: 0, Y: 0, Z: -offset};
+        this.#createSphyl(scene, material, position1, position2, radius);
+    }
+
+    constructor(armor, camera, width, height, color, opacity)
+    {
+        super(camera, width, height);
+        this.#armor = armor;
+        this.#color = color;
+        this.#opacity = opacity;
+    }
+
+    createScene()
+    {
+        const scene = new THREE.Scene();
+        scene.add(new THREE.AmbientLight(0xFFFFFF, 3.15));
+        const material = new THREE.MeshStandardMaterial({color: this.#color});
+        this.#createCollision(scene, material);
+        return scene;
+    }
+
+    createRenderTargetMaterial()
+    {
+        return new THREE.MeshBasicMaterial({
+            map: this.renderTarget.texture,
+            opacity: this.#opacity,
             transparent: true
         });
     }
@@ -419,8 +523,7 @@ function updateCamera(camera, cameraRotation)
     camera.position.set(700, 0, 0);
     camera.position.applyQuaternion(new THREE.Quaternion(quat.X, quat.Y, quat.Z, quat.W));
     camera.position.applyEuler(new THREE.Euler(0, 0, -Math.PI / 2));
-    camera.position.z += 100;
-    camera.lookAt(0, 0, 100);
+    camera.lookAt(0, 0, 0);
 }
 
 $(() => {
@@ -454,9 +557,14 @@ $(() => {
     renderer.clear();
     container.append(renderer.domElement);
 
-    addEventListener("armor-selected", event => {
-        const armor = ARMORS[event.index];
-        const scene = new CompositeScene(camera2d, camera3d, width, height);
+    function loadScene(index)
+    {
+        const armor = ARMORS[index];
+        const scene = new CompositeScene(armor, camera2d, camera3d, width, height);
         renderer.setAnimationLoop(() => scene.draw(renderer));
-    });
+    }
+
+    addEventListener("armor-selected", event => loadScene(event.detail.index));
+
+    loadScene(0);
 });
