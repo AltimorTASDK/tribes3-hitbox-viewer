@@ -543,12 +543,12 @@ $(() => {
     let dragging = false;
 
     container.on("mousedown", ({originalEvent: event}) => {
-        if (event.button == 0)
+        if (event.button === 0)
             dragging = true;
     });
 
     $(document).on("mouseup", ({originalEvent: event}) => {
-        if (event.button == 0)
+        if (event.button === 0)
             dragging = false;
     });
 
