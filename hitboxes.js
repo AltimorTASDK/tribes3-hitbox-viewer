@@ -4,6 +4,8 @@ import 'jcanvas';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+const BASE_HEIGHT = 200;
+
 const ARMORS = [
     {
         name: "Light",
@@ -102,15 +104,13 @@ class ArmorOption extends HTMLElement {
     static observedAttributes = ["index"];
 
     #index;
-
-    #shadow = this.attachShadow({mode: "closed"});
     #text = document.createElement("div");
 
     constructor()
     {
         super();
 
-        this.#shadow.appendChild(this.#text);
+        this.appendChild(this.#text);
 
         this.addEventListener("click", event => {
             this.dispatchEvent(new CustomEvent("armor-selected", {
@@ -140,8 +140,6 @@ class ArmorOption extends HTMLElement {
 customElements.define("armor-option", ArmorOption);
 
 class ArmorSelector extends HTMLElement {
-    #shadow = this.attachShadow({mode: "closed"});
-
     constructor()
     {
         super();
@@ -149,7 +147,7 @@ class ArmorSelector extends HTMLElement {
         for (let i = 0; i < ARMORS.length; i++) {
             const option = new ArmorOption();
             option.setAttribute("index", i);
-            this.#shadow.appendChild(option);
+            this.appendChild(option);
         }
     }
 }
@@ -517,13 +515,16 @@ class CollisionScene extends RenderTargetScene {
     }
 }
 
-function updateCamera(camera, cameraRotation)
+function updateCamera(armor, camera, cameraRotation)
 {
     const quat = rotatorToQuaternion(cameraRotation);
     camera.position.set(700, 0, 0);
     camera.position.applyQuaternion(new THREE.Quaternion(quat.X, quat.Y, quat.Z, quat.W));
     camera.position.applyEuler(new THREE.Euler(0, 0, -Math.PI / 2));
-    camera.lookAt(0, 0, 0);
+    // Make offset to bottom of capsule consistent
+    const adjust = (BASE_HEIGHT - armor.height) / 2;
+    camera.position.z += adjust;
+    camera.lookAt(0, 0, adjust);
 }
 
 $(() => {
@@ -537,10 +538,22 @@ $(() => {
     const camera3d = new THREE.PerspectiveCamera(20, width / height, 0.1, 1000);
 
     const cameraRotation = {Pitch: 0, Yaw: 0, Roll: 0};
-    updateCamera(camera3d, cameraRotation);
+
+    let armor = ARMORS[0];
+    let dragging = false;
+
+    container.on("mousedown", ({originalEvent: event}) => {
+        if (event.button == 0)
+            dragging = true;
+    });
+
+    $(document).on("mouseup", ({originalEvent: event}) => {
+        if (event.button == 0)
+            dragging = false;
+    });
 
     $(document).on("mousemove", ({originalEvent: event}) => {
-        if (!(event.buttons & 1))
+        if (!dragging || !(event.buttons & 1))
             return;
 
         const ROTATION_SENSITIVITY = 0.3;
@@ -548,7 +561,7 @@ $(() => {
         cameraRotation.Yaw   -= event.movementX * ROTATION_SENSITIVITY;
         cameraRotation.Pitch += event.movementY * ROTATION_SENSITIVITY;
         cameraRotation.Pitch = Math.min(Math.max(cameraRotation.Pitch, -89), 89);
-        updateCamera(camera3d, cameraRotation);
+        updateCamera(armor, camera3d, cameraRotation);
     });
 
     const renderer = new THREE.WebGLRenderer();
@@ -559,7 +572,8 @@ $(() => {
 
     function loadScene(index)
     {
-        const armor = ARMORS[index];
+        armor = ARMORS[index];
+        updateCamera(armor, camera3d, cameraRotation);
         const scene = new CompositeScene(armor, camera2d, camera3d, width, height);
         renderer.setAnimationLoop(() => scene.draw(renderer));
     }
