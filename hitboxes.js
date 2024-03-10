@@ -100,60 +100,6 @@ function addLights(scene)
     scene.add(light2);
 }
 
-class ArmorOption extends HTMLElement {
-    static observedAttributes = ["index"];
-
-    #index;
-    #text = document.createElement("div");
-
-    constructor()
-    {
-        super();
-
-        this.appendChild(this.#text);
-
-        this.addEventListener("click", event => {
-            this.dispatchEvent(new CustomEvent("armor-selected", {
-                bubbles: true,
-                composed: true,
-                detail: {index: this.#index}
-            }));
-        });
-    }
-
-    #setIndex(index)
-    {
-        this.#index = index;
-        this.#text.textContent = ARMORS[index]?.name;
-    }
-
-    attributeChangedCallback(name, oldValue, newValue)
-    {
-        switch (name) {
-            case "index":
-                this.#setIndex(newValue);
-                break;
-        }
-    }
-}
-
-customElements.define("armor-option", ArmorOption);
-
-class ArmorSelector extends HTMLElement {
-    constructor()
-    {
-        super();
-
-        for (let i = 0; i < ARMORS.length; i++) {
-            const option = new ArmorOption();
-            option.setAttribute("index", i);
-            this.appendChild(option);
-        }
-    }
-}
-
-customElements.define("armor-selector", ArmorSelector);
-
 class Scene {
     #scene;
 
@@ -185,7 +131,10 @@ class Scene {
 
 class CompositeScene extends Scene {
     static #fullscreenQuad = new THREE.PlaneGeometry(1, 1);
+    static #orthoCamera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0, 1);
 
+    #width;
+    #height;
     #armor;
     #scenes;
 
@@ -201,25 +150,30 @@ class CompositeScene extends Scene {
         return bones;
     }
 
-    #addScenes(camera3d, width, height, gltf, bones, hitboxes)
+    #addScenes(camera, gltf, bones, hitboxes)
     {
+        const width = this.#width;
+        const height = this.#height;
+
         this.#scenes.push(
-            new CharacterScene(camera3d, width, height, gltf),
-            new HitboxScene(this.#armor, camera3d, width, height, hitboxes, bones,
+            new CharacterScene(camera, width, height, gltf),
+            new HitboxScene(this.#armor, camera, width, height, hitboxes, bones,
                             0xFF0000, 0.5, e => e.Name === "hit_component"),
-            new HitboxScene(this.#armor, camera3d, width, height, hitboxes, bones,
+            new HitboxScene(this.#armor, camera, width, height, hitboxes, bones,
                             0xFF8000, 0.7, e => e.Name !== "hit_component"),
-            new CollisionScene(this.#armor, camera3d, width, height,
+            new CollisionScene(this.#armor, camera, width, height,
                             0x0000FF, 0.3));
 
         for (const {renderTargetMaterial} of this.#scenes)
             this.scene.add(new THREE.Mesh(CompositeScene.#fullscreenQuad, renderTargetMaterial));
     }
 
-    constructor(armor, camera2d, camera3d, width, height)
+    constructor(armor, camera, width, height)
     {
-        super(camera2d);
+        super(CompositeScene.#orthoCamera);
 
+        this.#width = width;
+        this.#height = height;
         this.#armor = armor;
         this.#scenes = [];
 
@@ -241,8 +195,15 @@ class CompositeScene extends Scene {
             gltf.scene.position.z = armor.offsetZ;
             gltf.scene.scale.setScalar(armor.scale);
 
-            this.#addScenes(camera3d, width, height, gltf, bones, hitboxes);
+            this.#addScenes(camera, gltf, bones, hitboxes);
         });
+    }
+
+    resize(width, height)
+    {
+        this.#width = width;
+        this.#height = height;
+        this.#scenes.forEach(scene => scene.resize(width, height));
     }
 
     draw(renderer)
@@ -284,6 +245,13 @@ class RenderTargetScene extends Scene {
             this.#renderTargetMaterial = this.createRenderTargetMaterial();
 
         return this.#renderTargetMaterial;
+    }
+
+    resize(width, height)
+    {
+        this.#width = width;
+        this.#height = height;
+        this.#renderTarget = undefined;
     }
 
     draw(renderer)
@@ -515,70 +483,136 @@ class CollisionScene extends RenderTargetScene {
     }
 }
 
-function updateCamera(armor, camera, cameraRotation)
-{
-    const quat = rotatorToQuaternion(cameraRotation);
-    camera.position.set(700, 0, 0);
-    camera.position.applyQuaternion(new THREE.Quaternion(quat.X, quat.Y, quat.Z, quat.W));
-    camera.position.applyEuler(new THREE.Euler(0, 0, -Math.PI / 2));
-    // Make offset to bottom of capsule consistent
-    const adjust = (BASE_HEIGHT - armor.height) / 2;
-    camera.position.z += adjust;
-    camera.lookAt(0, 0, adjust);
-}
+class ArmorOption extends HTMLElement {
+    static observedAttributes = ["index"];
 
-$(() => {
-    THREE.Object3D.DEFAULT_UP = new THREE.Vector3(0, 0, 1);
+    #index;
+    #text = document.createElement("div");
 
-    const container = $("#renderer-container");
-    const width = container.innerWidth();
-    const height = container.innerHeight();
-
-    const camera2d = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0, 1);
-    const camera3d = new THREE.PerspectiveCamera(20, width / height, 0.1, 1000);
-
-    const cameraRotation = {Pitch: 0, Yaw: 0, Roll: 0};
-
-    let armor = ARMORS[0];
-    let dragging = false;
-
-    container.on("mousedown", ({originalEvent: event}) => {
-        if (event.button === 0)
-            dragging = true;
-    });
-
-    $(document).on("mouseup", ({originalEvent: event}) => {
-        if (event.button === 0)
-            dragging = false;
-    });
-
-    $(document).on("mousemove", ({originalEvent: event}) => {
-        if (!dragging || !(event.buttons & 1))
-            return;
-
-        const ROTATION_SENSITIVITY = 0.3;
-
-        cameraRotation.Yaw   -= event.movementX * ROTATION_SENSITIVITY;
-        cameraRotation.Pitch += event.movementY * ROTATION_SENSITIVITY;
-        cameraRotation.Pitch = Math.min(Math.max(cameraRotation.Pitch, -89), 89);
-        updateCamera(armor, camera3d, cameraRotation);
-    });
-
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(width, height);
-    renderer.setClearAlpha(0.0);
-    renderer.clear();
-    container.append(renderer.domElement);
-
-    function loadScene(index)
+    constructor()
     {
-        armor = ARMORS[index];
-        updateCamera(armor, camera3d, cameraRotation);
-        const scene = new CompositeScene(armor, camera2d, camera3d, width, height);
-        renderer.setAnimationLoop(() => scene.draw(renderer));
+        super();
+
+        this.appendChild(this.#text);
+
+        this.addEventListener("click", event => {
+            this.dispatchEvent(new CustomEvent("armor-selected", {
+                bubbles: true,
+                composed: true,
+                detail: {index: this.#index}
+            }));
+        });
     }
 
-    addEventListener("armor-selected", event => loadScene(event.detail.index));
+    #setIndex(index)
+    {
+        this.#index = index;
+        this.#text.textContent = ARMORS[index]?.name;
+    }
 
-    loadScene(0);
-});
+    attributeChangedCallback(name, oldValue, newValue)
+    {
+        switch (name) {
+            case "index":
+                this.#setIndex(newValue);
+                break;
+        }
+    }
+}
+
+customElements.define("armor-option", ArmorOption);
+
+class ArmorSelector extends HTMLElement {
+    constructor()
+    {
+        super();
+
+        for (let i = 0; i < ARMORS.length; i++) {
+            const option = new ArmorOption();
+            option.setAttribute("index", i);
+            this.appendChild(option);
+        }
+    }
+}
+
+customElements.define("armor-selector", ArmorSelector);
+
+class HitboxCanvas extends HTMLCanvasElement {
+    constructor()
+    {
+        super();
+
+        THREE.Object3D.DEFAULT_UP = new THREE.Vector3(0, 0, 1);
+
+        this.renderer = new THREE.WebGLRenderer({canvas: this, alpha: true, depth: false});
+        this.renderer.clear();
+
+        this.cameraRotation = {Pitch: 0, Yaw: 0, Roll: 0};
+        this.armor = ARMORS[0];
+        this.dragging = false;
+
+        $(this).on("mousedown", ({originalEvent: event}) => {
+            if (event.button === 0)
+                this.dragging = true;
+        });
+
+        $(document).on("mouseup", ({originalEvent: event}) => {
+            if (event.button === 0)
+                this.dragging = false;
+        });
+
+        $(document).on("mousemove", ({originalEvent: event}) => {
+            if (!this.dragging || !(event.buttons & 1))
+                return;
+
+            const ROTATION_SENSITIVITY = 0.3;
+
+            this.cameraRotation.Yaw   -= event.movementX * ROTATION_SENSITIVITY;
+            this.cameraRotation.Pitch += event.movementY * ROTATION_SENSITIVITY;
+            this.cameraRotation.Pitch = Math.min(Math.max(this.cameraRotation.Pitch, -89), 89);
+            this.#updateCamera();
+        });
+
+        new ResizeObserver(entries => {
+            for (const {contentRect: {width: width, height: height}} of entries) {
+                this.renderer.setDrawingBufferSize(width, height, 1);
+                this.camera.aspect = width / height;
+                this.camera.updateProjectionMatrix();
+                this.scene.resize(width, height);
+            }
+        }).observe(this);
+
+        const loadScene = index => {
+            const resolution = this.getResolution();
+            this.armor = ARMORS[index];
+            this.camera = new THREE.PerspectiveCamera(20, resolution.x / resolution.y, 0.1, 1000);
+            this.#updateCamera();
+
+            this.scene = new CompositeScene(this.armor, this.camera, resolution.x, resolution.y);
+            this.renderer.setAnimationLoop(() => this.scene.draw(this.renderer));
+        }
+
+        addEventListener("armor-selected", event => loadScene(event.detail.index));
+
+        loadScene(0);
+    }
+
+    getResolution()
+    {
+        return this.renderer.getDrawingBufferSize(new THREE.Vector2());
+    }
+
+    #updateCamera()
+    {
+        const quat = rotatorToQuaternion(this.cameraRotation);
+        this.camera.position.set(700, 0, 0);
+        this.camera.position.applyQuaternion(new THREE.Quaternion(quat.X, quat.Y, quat.Z, quat.W));
+        this.camera.position.applyEuler(new THREE.Euler(0, 0, -Math.PI / 2));
+        // Make offset to bottom of capsule consistent
+        const adjust = (BASE_HEIGHT - this.armor.height) / 2;
+        this.camera.position.z += adjust;
+        this.camera.lookAt(0, 0, adjust);
+    }
+}
+
+customElements.define("hitbox-canvas", HitboxCanvas, {extends: "canvas"});
