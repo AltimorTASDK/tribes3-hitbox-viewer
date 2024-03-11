@@ -234,7 +234,7 @@ class RenderTargetScene extends Scene {
     get renderTarget()
     {
         if (this.#renderTarget === undefined)
-            this.#renderTarget = this.createRenderTarget(this.#width, this.#height);
+            this.updateRenderTarget();
 
         return this.#renderTarget;
     }
@@ -242,9 +242,19 @@ class RenderTargetScene extends Scene {
     get renderTargetMaterial()
     {
         if (this.#renderTargetMaterial === undefined)
-            this.#renderTargetMaterial = this.createRenderTargetMaterial();
+            this.updateRenderTargetMaterial();
 
         return this.#renderTargetMaterial;
+    }
+
+    updateRenderTarget()
+    {
+        this.#renderTarget = this.createRenderTarget(this.#width, this.#height);
+    }
+
+    updateRenderTargetMaterial()
+    {
+        this.#renderTargetMaterial = this.createRenderTargetMaterial();
     }
 
     resize(width, height)
@@ -473,12 +483,39 @@ class CollisionScene extends RenderTargetScene {
         return scene;
     }
 
+    updateRenderTarget()
+    {
+        super.updateRenderTarget();
+        this.updateRenderTargetMaterial();
+    }
+
     createRenderTargetMaterial()
     {
-        return new THREE.MeshBasicMaterial({
-            map: this.renderTarget.texture,
-            opacity: this.#opacity,
-            transparent: true
+        return new THREE.ShaderMaterial({
+            transparent: true,
+            uniforms: {
+                map: {value: this.renderTarget.texture},
+                opacity: {value: this.#opacity}
+            },
+            vertexShader: `
+                varying vec2 vUv;
+
+                void main() {
+                    vUv = uv;
+					gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+				}
+			`,
+            fragmentShader: `
+                varying vec2 vUv;
+
+                uniform sampler2D map;
+                uniform float opacity;
+
+                void main() {
+                    vec4 color = texture2D(map, vUv);
+                    gl_FragColor = vec4(color.rgb, color.a * opacity);
+				}
+			`
         });
     }
 }
@@ -573,28 +610,33 @@ class HitboxCanvas extends HTMLCanvasElement {
             this.#updateCamera();
         });
 
-        new ResizeObserver(entries => {
-            for (const {contentRect: {width: width, height: height}} of entries) {
-                this.renderer.setDrawingBufferSize(width, height, 1);
-                this.camera.aspect = width / height;
-                this.camera.updateProjectionMatrix();
-                this.scene.resize(width, height);
-            }
-        }).observe(this);
-
         const loadScene = index => {
             const resolution = this.getResolution();
             this.armor = ARMORS[index];
-            this.camera = new THREE.PerspectiveCamera(20, resolution.x / resolution.y, 0.1, 1000);
+            this.camera = new THREE.PerspectiveCamera(20, resolution.x / resolution.y, 0.1, 10000);
             this.#updateCamera();
 
             this.scene = new CompositeScene(this.armor, this.camera, resolution.x, resolution.y);
             this.renderer.setAnimationLoop(() => this.scene.draw(this.renderer));
-        }
+        };
 
         addEventListener("armor-selected", event => loadScene(event.detail.index));
 
         loadScene(0);
+
+        const updateSize = (width, height) => {
+            this.renderer.setDrawingBufferSize(width, height, 1);
+            this.camera.aspect = width / height;
+            this.camera.updateProjectionMatrix();
+            this.scene.resize(width, height);
+        };
+
+        new ResizeObserver(entries => {
+            for (const entry of entries)
+                updateSize(entry.contentRect.width, entry.contentRect.height);
+        }).observe(this);
+
+        updateSize($(this).width(), $(this).height());
     }
 
     getResolution()
