@@ -158,9 +158,9 @@ class CompositeScene extends Scene {
         this.#scenes.push(
             new CharacterScene(camera, width, height, gltf),
             new HitboxScene(this.#armor, camera, width, height, hitboxes, bones,
-                            0x4060FF, 0.6, e => e.Name === "hit_component"),
+                            0x2060FF, 0.6, e => e.Name === "hit_component"),
             new HitboxScene(this.#armor, camera, width, height, hitboxes, bones,
-                            0x40A0FF, 0.7, e => e.Name !== "hit_component"),
+                            0x4080FF, 0.7, e => e.Name !== "hit_component"),
             new CollisionScene(this.#armor, camera, width, height,
                             0xFFFFFF, 0.7));
 
