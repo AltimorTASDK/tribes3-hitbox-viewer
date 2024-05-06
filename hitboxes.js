@@ -160,9 +160,9 @@ class CompositeScene extends Scene {
             new HitboxScene(this.#armor, camera, width, height, hitboxes, bones,
                             0xFF0000, 0.5, e => e.Name === "hit_component"),
             new HitboxScene(this.#armor, camera, width, height, hitboxes, bones,
-                            0xFF8000, 0.7, e => e.Name !== "hit_component"),
+                            0xFF5000, 0.7, e => e.Name !== "hit_component"),
             new CollisionScene(this.#armor, camera, width, height,
-                            0x0000FF, 0.2));
+                            0xFFFFFF, 0.7));
 
         for (const {renderTargetMaterial} of this.#scenes)
             this.scene.add(new THREE.Mesh(CompositeScene.#fullscreenQuad, renderTargetMaterial));
@@ -495,6 +495,8 @@ class CollisionScene extends RenderTargetScene {
             transparent: true,
             uniforms: {
                 map: {value: this.renderTarget.texture},
+                width: {value: this.renderTarget.width},
+                height: {value: this.renderTarget.height},
                 opacity: {value: this.#opacity}
             },
             vertexShader: `
@@ -509,11 +511,30 @@ class CollisionScene extends RenderTargetScene {
                 varying vec2 vUv;
 
                 uniform sampler2D map;
+                uniform float width;
+                uniform float height;
                 uniform float opacity;
 
+                const float PI = 3.1415926538;
+
+                float alpha_test(float x, float y) {
+                    const float RADIUS = 0.005;
+                    float inv_aspect = height / width;
+                    vec2 offset = vec2(x * RADIUS * inv_aspect, y * RADIUS);
+                    return texture2D(map, vUv + offset).a;
+                }
+
                 void main() {
+                    const int SAMPLES = 8;
+                    float neighbor_alpha = 1.0;
+
+                    for (int index = 0; index < SAMPLES; index++) {
+                        float angle = float(index) * (1.0/float(SAMPLES)*2.0*PI);
+                        neighbor_alpha = min(neighbor_alpha, alpha_test(cos(angle), sin(angle)));
+                    }
+
                     vec4 color = texture2D(map, vUv);
-                    gl_FragColor = vec4(color.rgb, color.a * opacity);
+                    gl_FragColor = vec4(color.rgb, color.a * opacity * (1.0 - neighbor_alpha));
 				}
 			`
         });
