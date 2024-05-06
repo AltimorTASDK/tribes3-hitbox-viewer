@@ -162,7 +162,7 @@ class CompositeScene extends Scene {
             new HitboxScene(this.#armor, camera, width, height, hitboxes, bones,
                             0xFF8000, 0.7, e => e.Name !== "hit_component"),
             new CollisionScene(this.#armor, camera, width, height,
-                            0x0000FF, 0.3));
+                            0x0000FF, 0.2));
 
         for (const {renderTargetMaterial} of this.#scenes)
             this.scene.add(new THREE.Mesh(CompositeScene.#fullscreenQuad, renderTargetMaterial));
