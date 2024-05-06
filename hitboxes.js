@@ -525,6 +525,11 @@ class CollisionScene extends RenderTargetScene {
                 }
 
                 void main() {
+                    vec4 color = texture2D(map, vUv);
+
+                    if (color.a == 0.0)
+                        discard;
+
                     const int SAMPLES = 8;
                     float neighbor_alpha = 1.0;
 
@@ -533,7 +538,9 @@ class CollisionScene extends RenderTargetScene {
                         neighbor_alpha = min(neighbor_alpha, alpha_test(cos(angle), sin(angle)));
                     }
 
-                    vec4 color = texture2D(map, vUv);
+                    if (neighbor_alpha == 1.0)
+                        discard;
+
                     gl_FragColor = vec4(color.rgb, color.a * opacity * (1.0 - neighbor_alpha));
 				}
 			`
