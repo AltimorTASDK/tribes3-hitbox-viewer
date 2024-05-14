@@ -284,10 +284,8 @@ class CharacterScene extends RenderTargetScene {
 }
 
 class HitboxScene extends RenderTargetScene {
-    static #cylinderGeometry   = new THREE.CylinderGeometry(1, 1, 1, 32, 1);
-    static #halfSphereGeometry = new THREE.SphereGeometry(1, 16, 16, Math.PI, Math.PI);
-    static #sphereGeometry     = new THREE.SphereGeometry(1, 16, 16);
-    static #boxGeometry        = new THREE.BoxGeometry(1, 1, 1);
+    static #sphereGeometry = new THREE.SphereGeometry(1, 16, 16);
+    static #boxGeometry    = new THREE.BoxGeometry(1, 1, 1);
 
     #armor;
     #hitboxes;
@@ -296,70 +294,66 @@ class HitboxScene extends RenderTargetScene {
     opacity;
     #filter;
 
-    #createSphyl(scene, material, start, end, radius)
+    #createSphyl(scene, material, elem, bone)
     {
-        const direction = end.clone().sub(start);
-        const length = direction.length();
-        direction.normalize();
+        if (elem.Length === 0.0) {
+            this.#createSphere(scene, material, elem, bone);
+            return;
+        }
 
-        const cylinder = new THREE.Mesh(HitboxScene.#cylinderGeometry, material);
-        cylinder.scale.set(radius, length, radius);
-        cylinder.lookAt(direction);
-        cylinder.rotateX(Math.PI / 2);
-        cylinder.position.copy(start);
-        cylinder.position.lerp(end, 0.5);
-        scene.add(cylinder);
+        const quaternion  = rotatorToQuaternion(elem.Rotation);
+        const localOffset = new THREE.Vector3(0, 0, elem.Length / 2).applyQuaternion(quaternion);
+        const localCenter = toThreeVector(elem.Center);
 
-        const startCap = new THREE.Mesh(HitboxScene.#halfSphereGeometry, material);
-        startCap.scale.set(radius, radius, radius);
-        startCap.lookAt(direction);
-        startCap.position.copy(start);
-        scene.add(startCap);
+        const center = bone.localToWorld(localCenter.clone());
+        const offset = bone.localToWorld(localCenter.clone().add(localOffset)).sub(center);
+        const radius = elem.Radius * this.#armor.scale;
 
-        const endCap = new THREE.Mesh(HitboxScene.#halfSphereGeometry, material);
-        endCap.scale.set(radius, radius, radius);
-        endCap.lookAt(direction.clone().negate());
-        endCap.position.copy(end);
-        scene.add(endCap);
+        const geometry = new THREE.CapsuleGeometry(radius, offset.length() * 2, 8, 32);
+        const capsule = new THREE.Mesh(geometry, material);
+        capsule.lookAt(offset);
+        capsule.rotateX(Math.PI / 2);
+        capsule.position.copy(center);
+        scene.add(capsule);
+    }
+
+    #createSphere(scene, material, elem, bone)
+    {
+        const center = bone.localToWorld(toThreeVector(elem.Center));
+        const sphere = new THREE.Mesh(HitboxScene.#sphereGeometry, material);
+        sphere.scale.setScalar(elem.Radius * this.#armor.scale);
+        sphere.position.copy(center);
+        scene.add(sphere);
+    }
+
+    #createBox(scene, material, elem, bone)
+    {
+        const center = bone.localToWorld(toThreeVector(elem.Center));
+        const box = new THREE.Mesh(HitboxScene.#boxGeometry, material);
+        box.scale.set(elem.X, elem.Y, elem.Z);
+        box.scale.multiplyScalar(this.#armor.scale);
+        bone.getWorldQuaternion(box.quaternion);
+        box.rotateX(elem.Rotation.Pitch *  Math.PI / 180 + Math.PI / 2);
+        box.rotateY(elem.Rotation.Yaw   *  Math.PI / 180);
+        box.rotateZ(elem.Rotation.Roll  * -Math.PI / 180);
+        box.position.copy(center);
+        scene.add(box);
     }
 
     #createHitbox(scene, material, hitbox)
     {
         const bone = this.#bones[hitbox.BoneName.toLowerCase()];
-        const scale = this.#armor.scale;
 
         const createSphyl = elem => {
-            if (elem.Length === 0.0) {
-                createSphere(elem);
-                return;
-            }
-            const quaternion = rotatorToQuaternion(elem.Rotation);
-            const offset1 = new THREE.Vector3(0, 0, elem.Length / 2).applyQuaternion(quaternion);
-            const offset2 = offset1.clone().negate();
-            const position1 = bone.localToWorld(offset1.add(toThreeVector(elem.Center)));
-            const position2 = bone.localToWorld(offset2.add(toThreeVector(elem.Center)));
-            this.#createSphyl(scene, material, position1, position2, elem.Radius * scale);
+            this.#createSphyl(scene, material, elem, bone);
         }
 
         const createSphere = elem => {
-            const center = bone.localToWorld(toThreeVector(elem.Center));
-            const sphere = new THREE.Mesh(HitboxScene.#sphereGeometry, material);
-            sphere.scale.setScalar(elem.Radius * scale);
-            sphere.position.copy(center);
-            scene.add(sphere);
+            this.#createSphere(scene, material, elem, bone);
         }
 
         const createBox = elem => {
-            const center = bone.localToWorld(toThreeVector(elem.Center));
-            const box = new THREE.Mesh(HitboxScene.#boxGeometry, material);
-            box.scale.set(elem.X, elem.Y, elem.Z);
-            box.scale.multiplyScalar(scale);
-            bone.getWorldQuaternion(box.quaternion);
-            box.rotateX(elem.Rotation.Pitch *  Math.PI / 180 + Math.PI / 2);
-            box.rotateY(elem.Rotation.Yaw   *  Math.PI / 180);
-            box.rotateZ(elem.Rotation.Roll  * -Math.PI / 180);
-            box.position.copy(center);
-            scene.add(box);
+            this.#createBox(scene, material, elem, bone);
         }
 
         hitbox.AggGeom.SphylElems?.filter(this.#filter)?.forEach(createSphyl);
