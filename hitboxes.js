@@ -392,48 +392,18 @@ class HitboxScene extends RenderTargetScene {
 }
 
 class CollisionScene extends RenderTargetScene {
-    static #cylinderGeometry   = new THREE.CylinderGeometry(1, 1, 1, 32, 1);
-    static #halfSphereGeometry = new THREE.SphereGeometry(1, 16, 16, Math.PI, Math.PI);
-
     #armor;
     #color;
     #opacity;
 
-    #createSphyl(scene, material, start, end, radius)
-    {
-        const direction = new THREE.Vector3(end.X - start.X, end.Y - start.Y, end.Z - start.Z);
-        const length = direction.length();
-        direction.normalize();
-
-        const cylinder = new THREE.Mesh(CollisionScene.#cylinderGeometry, material);
-        cylinder.scale.set(radius, length, radius);
-        cylinder.lookAt(direction);
-        cylinder.rotateX(Math.PI / 2);
-        cylinder.position.set(start.X, start.Y, start.Z);
-        cylinder.position.lerp(new THREE.Vector3(end.X, end.Y, end.Z), 0.5);
-        scene.add(cylinder);
-
-        const startCap = new THREE.Mesh(CollisionScene.#halfSphereGeometry, material);
-        startCap.scale.set(radius, radius, radius);
-        startCap.lookAt(direction);
-        startCap.position.set(start.X, start.Y, start.Z);
-        scene.add(startCap);
-
-        const endCap = new THREE.Mesh(CollisionScene.#halfSphereGeometry, material);
-        endCap.scale.set(radius, radius, radius);
-        endCap.lookAt(direction);
-        endCap.rotateX(Math.PI);
-        endCap.position.set(end.X, end.Y, end.Z);
-        scene.add(endCap);
-    }
-
     #createCollision(scene, material)
     {
         const radius = this.#armor.radius;
-        const offset = this.#armor.height / 2 - radius;
-        const position1 = {X: 0, Y: 0, Z:  offset};
-        const position2 = {X: 0, Y: 0, Z: -offset};
-        this.#createSphyl(scene, material, position1, position2, radius);
+        const height = this.#armor.height - radius * 2;
+        const geometry = new THREE.CapsuleGeometry(radius, height, 8, 32);
+        const capsule = new THREE.Mesh(geometry, material);
+        capsule.rotateX(Math.PI / 2);
+        scene.add(capsule);
     }
 
     constructor(armor, camera, width, height, color, opacity)
