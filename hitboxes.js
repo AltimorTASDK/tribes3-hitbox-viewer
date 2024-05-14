@@ -36,32 +36,9 @@ const ARMORS = [
     }
 ];
 
-function hamiltonProduct(a, b)
+function toThreeVector(vector)
 {
-    return {
-        X: a.W * b.X + a.X * b.W + a.Y * b.Z - a.Z * b.Y,
-        Y: a.W * b.Y - a.X * b.Z + a.Y * b.W + a.Z * b.X,
-        Z: a.W * b.Z + a.X * b.Y - a.Y * b.X + a.Z * b.W,
-        W: a.W * b.W - a.X * b.X - a.Y * b.Y - a.Z * b.Z
-    };
-}
-
-function quaternionInverse(quaternion)
-{
-    return {X: -quaternion.X, Y: -quaternion.Y, Z: -quaternion.Z, W: quaternion.W};
-}
-
-function rotateVectorByQuaternion(vector, rotation)
-{
-    const point = {X: vector.X, Y: vector.Y, Z: vector.Z, W: 0};
-    const inverse = quaternionInverse(rotation);
-    const rotated = hamiltonProduct(hamiltonProduct(rotation, point), inverse);
-    return {X: rotated.X, Y: rotated.Y, Z: rotated.Z};
-}
-
-function vectorAdd(a, b)
-{
-    return {X: a.X + b.X, Y: a.Y + b.Y, Z: a.Z + b.Z};
+    return new THREE.Vector3(vector.X, vector.Y, vector.Z);
 }
 
 function rotatorToQuaternion(rotator)
@@ -73,18 +50,11 @@ function rotatorToQuaternion(rotator)
     const sr = Math.sin(rotator.Roll  * Math.PI / 360);
     const cr = Math.cos(rotator.Roll  * Math.PI / 360);
 
-    return {
-        X:  cr * sp * sy - sr * cp * cy,
-        Y: -cr * sp * cy - sr * cp * sy,
-        Z:  cr * cp * sy - sr * sp * cy,
-        W:  cr * cp * cy + sr * sp * sy
-    };
-}
-
-function boneTransform(bone, point)
-{
-    const world = bone.localToWorld(new THREE.Vector3(point.X, point.Y, point.Z));
-    return {X: world.x, Y: world.y, Z: world.z};
+    return new THREE.Quaternion(
+         cr * sp * sy - sr * cp * cy,
+        -cr * sp * cy - sr * cp * sy,
+         cr * cp * sy - sr * sp * cy,
+         cr * cp * cy + sr * sp * sy);
 }
 
 function addLights(scene)
@@ -328,7 +298,7 @@ class HitboxScene extends RenderTargetScene {
 
     #createSphyl(scene, material, start, end, radius)
     {
-        const direction = new THREE.Vector3(end.X - start.X, end.Y - start.Y, end.Z - start.Z);
+        const direction = end.clone().sub(start);
         const length = direction.length();
         direction.normalize();
 
@@ -336,21 +306,20 @@ class HitboxScene extends RenderTargetScene {
         cylinder.scale.set(radius, length, radius);
         cylinder.lookAt(direction);
         cylinder.rotateX(Math.PI / 2);
-        cylinder.position.set(start.X, start.Y, start.Z);
-        cylinder.position.lerp(new THREE.Vector3(end.X, end.Y, end.Z), 0.5);
+        cylinder.position.copy(start);
+        cylinder.position.lerp(end, 0.5);
         scene.add(cylinder);
 
         const startCap = new THREE.Mesh(HitboxScene.#halfSphereGeometry, material);
         startCap.scale.set(radius, radius, radius);
         startCap.lookAt(direction);
-        startCap.position.set(start.X, start.Y, start.Z);
+        startCap.position.copy(start);
         scene.add(startCap);
 
         const endCap = new THREE.Mesh(HitboxScene.#halfSphereGeometry, material);
         endCap.scale.set(radius, radius, radius);
-        endCap.lookAt(direction);
-        endCap.rotateX(Math.PI);
-        endCap.position.set(end.X, end.Y, end.Z);
+        endCap.lookAt(direction.clone().negate());
+        endCap.position.copy(end);
         scene.add(endCap);
     }
 
@@ -359,26 +328,29 @@ class HitboxScene extends RenderTargetScene {
         const bone = this.#bones[hitbox.BoneName.toLowerCase()];
         const scale = this.#armor.scale;
 
-        hitbox.AggGeom.SphylElems?.filter(this.#filter)?.forEach(elem => {
-            const rotation = rotatorToQuaternion(elem.Rotation);
-            const offset1 = rotateVectorByQuaternion({X: 0, Y: 0, Z:  elem.Length / 2}, rotation);
-            const offset2 = rotateVectorByQuaternion({X: 0, Y: 0, Z: -elem.Length / 2}, rotation);
-            const position1 = boneTransform(bone, vectorAdd(offset1, elem.Center));
-            const position2 = boneTransform(bone, vectorAdd(offset2, elem.Center));
-            const radius = elem.Radius * scale;
-            this.#createSphyl(scene, material, position1, position2, radius);
-        });
+        const createSphyl = elem => {
+            if (elem.Length === 0.0) {
+                createSphere(elem);
+                return;
+            }
+            const quaternion = rotatorToQuaternion(elem.Rotation);
+            const offset1 = new THREE.Vector3(0, 0, elem.Length / 2).applyQuaternion(quaternion);
+            const offset2 = offset1.clone().negate();
+            const position1 = bone.localToWorld(offset1.add(toThreeVector(elem.Center)));
+            const position2 = bone.localToWorld(offset2.add(toThreeVector(elem.Center)));
+            this.#createSphyl(scene, material, position1, position2, elem.Radius * scale);
+        }
 
-        hitbox.AggGeom.SphereElems?.filter(this.#filter)?.forEach(elem => {
-            const center = boneTransform(bone, elem.Center);
+        const createSphere = elem => {
+            const center = bone.localToWorld(toThreeVector(elem.Center));
             const sphere = new THREE.Mesh(HitboxScene.#sphereGeometry, material);
             sphere.scale.setScalar(elem.Radius * scale);
-            sphere.position.set(center.X, center.Y, center.Z);
+            sphere.position.copy(center);
             scene.add(sphere);
-        });
+        }
 
-        hitbox.AggGeom.BoxElems?.filter(this.#filter)?.forEach(elem => {
-            const center = boneTransform(bone, elem.Center);
+        const createBox = elem => {
+            const center = bone.localToWorld(toThreeVector(elem.Center));
             const box = new THREE.Mesh(HitboxScene.#boxGeometry, material);
             box.scale.set(elem.X, elem.Y, elem.Z);
             box.scale.multiplyScalar(scale);
@@ -386,9 +358,13 @@ class HitboxScene extends RenderTargetScene {
             box.rotateX(elem.Rotation.Pitch *  Math.PI / 180 + Math.PI / 2);
             box.rotateY(elem.Rotation.Yaw   *  Math.PI / 180);
             box.rotateZ(elem.Rotation.Roll  * -Math.PI / 180);
-            box.position.set(center.X, center.Y, center.Z);
+            box.position.copy(center);
             scene.add(box);
-        });
+        }
+
+        hitbox.AggGeom.SphylElems?.filter(this.#filter)?.forEach(createSphyl);
+        hitbox.AggGeom.SphereElems?.filter(this.#filter)?.forEach(createSphere);
+        hitbox.AggGeom.BoxElems?.filter(this.#filter)?.forEach(createBox);
     }
 
     constructor(armor, camera, width, height, hitboxes, bones, color, opacity, filter)
@@ -674,9 +650,8 @@ class HitboxCanvas extends HTMLCanvasElement {
 
     #updateCamera()
     {
-        const quat = rotatorToQuaternion(this.cameraRotation);
         this.camera.position.set(700, 0, 0);
-        this.camera.position.applyQuaternion(new THREE.Quaternion(quat.X, quat.Y, quat.Z, quat.W));
+        this.camera.position.applyQuaternion(rotatorToQuaternion(this.cameraRotation));
         this.camera.position.applyEuler(new THREE.Euler(0, 0, -Math.PI / 2));
         // Make offset to bottom of capsule consistent
         const adjust = (BASE_HEIGHT - this.armor.height) / 2;
