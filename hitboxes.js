@@ -592,6 +592,8 @@ class HitboxCanvas extends HTMLCanvasElement {
         loadScene(0);
 
         const updateSize = (width, height) => {
+            width = Math.floor(width);
+            height = Math.floor(height);
             this.renderer.setDrawingBufferSize(width, height, 1);
             this.camera.aspect = width / height;
             this.camera.updateProjectionMatrix();
