@@ -434,10 +434,7 @@ class CollisionScene extends RenderTargetScene {
         return new THREE.ShaderMaterial({
             transparent: true,
             uniforms: {
-                map: {value: this.renderTarget.texture},
-                width: {value: this.renderTarget.width},
-                height: {value: this.renderTarget.height},
-                opacity: {value: this.#opacity}
+                map: {value: this.renderTarget.texture}
             },
             vertexShader: `
                 out vec2 vUv;
