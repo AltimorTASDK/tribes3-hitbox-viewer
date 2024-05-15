@@ -440,7 +440,7 @@ class CollisionScene extends RenderTargetScene {
                 opacity: {value: this.#opacity}
             },
             vertexShader: `
-                varying vec2 vUv;
+                out vec2 vUv;
 
                 void main() {
                     vUv = uv;
@@ -448,21 +448,17 @@ class CollisionScene extends RenderTargetScene {
 				}
 			`,
             fragmentShader: `
-                varying vec2 vUv;
+                in vec2 vUv;
 
                 uniform sampler2D map;
-                uniform float width;
-                uniform float height;
-                uniform float opacity;
 
-                const float PI = 3.1415926538;
+                const float WIDTH = float(${this.renderTarget.width});
+                const float HEIGHT = float(${this.renderTarget.height});
+                const float OPACITY = float(${this.#opacity});
 
-                float alpha_test(float x, float y) {
-                    const float RADIUS = 0.005;
-                    float inv_aspect = height / width;
-                    vec2 offset = vec2(x * RADIUS * inv_aspect, y * RADIUS);
-                    return texture2D(map, vUv + offset).a;
-                }
+                const float RADIUS = 0.005;
+                const int RADIUS_PX = int(RADIUS * HEIGHT);
+                const int RADIUS_SQR_PX = int(pow(RADIUS * HEIGHT, 2.0));
 
                 void main() {
                     vec4 color = texture2D(map, vUv);
@@ -470,18 +466,21 @@ class CollisionScene extends RenderTargetScene {
                     if (color.a == 0.0)
                         discard;
 
-                    const int SAMPLES = 8;
                     float neighbor_alpha = 1.0;
 
-                    for (int index = 0; index < SAMPLES; index++) {
-                        float angle = float(index) * (1.0/float(SAMPLES)*2.0*PI);
-                        neighbor_alpha = min(neighbor_alpha, alpha_test(cos(angle), sin(angle)));
+                    for (int x = -RADIUS_PX; x <= RADIUS_PX; x++) {
+                        for (int y = -RADIUS_PX; y <= RADIUS_PX; y++) {
+                            if (x*x + y*y <= RADIUS_SQR_PX) {
+                                vec2 offset = vec2(x, y) * vec2(1.0 / WIDTH, 1.0 / HEIGHT);
+                                neighbor_alpha *= texture2D(map, vUv + offset).a;
+                            }
+                        }
                     }
 
-                    if (neighbor_alpha == 1.0)
+                    if (neighbor_alpha != 0.0)
                         discard;
 
-                    gl_FragColor = vec4(color.rgb, color.a * opacity * (1.0 - neighbor_alpha));
+                    gl_FragColor = vec4(color.rgb, OPACITY);
 				}
 			`
         });
